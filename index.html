@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام التحكم بالوصول السحابي</title>
+    <style>
+        body {
+            font-family: Tahoma, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        input {
+            padding: 10px;
+            width: 80%;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 85%;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #status {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .log-box {
+            background: #e9ecef;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 5px;
+            text-align: right;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 13px;
+        }
+        .log-item {
+            border-bottom: 1px solid #ccc;
+            padding: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>نظام التحكم بالوصول</h2>
+        <p>محاكاة فحص الكارت السحابي</p>
+        
+        <input type="text" id="cardInput" placeholder="أدخل رقم الكارت (مثال: C001)">
+        <button onclick="simulateScan()">فحص الكارت وتسجيل الدخول</button>
+        
+        <div id="status"></div>
+        
+        <div class="log-box">
+            <strong>السجلات الأخيرة في السحابة:</strong>
+            <div id="logList">جاري التحميل...</div>
+        </div>
+    </div>
+
+    <script>
+        const BIN_ID = "6ad63709ffd5d1605379280a";
+        const API_KEY = "$2a$10$B/lrLx7OzVkD1fNOy6qb.OLupBAhUi43qUZ.xITLWykvf1wvdB4Nu";
+
+        // 1. قاعدة بيانات الطلاب المسموح لهم بالدخول (تستطيع التعديل أو الإضافة عليها)
+        const allowedStudents = {
+            "C001": "أحمد علي",
+            "C002": "محمد جاسم",
+            "C003": "حسين كريم",
+            "C004": "زينب فاضل",
+            "C005": "زهراء حسن"
+        };
+
+        // دالة لجلب السجلات من السحابة وعرضها
+        async function fetchLogs() {
+            try {
+                let response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                    headers: { "X-Master-Key": API_KEY }
+                });
+                let data = await response.json();
+                let logs = data.record.logs || [];
+                
+                let logListDiv = document.getElementById("logList");
+                logListDiv.innerHTML = "";
+                
+                logs.slice(-6).reverse().forEach(log => {
+                    let item = document.createElement("div");
+                    item.className = "log-item";
+                    let color = log.status.includes("مسموح") ? "green" : "red";
+                    item.innerHTML = `<strong>الاسم:</strong> ${log.studentName}<br>
+                                      <strong>الكارت:</strong> ${log.cardId} | 
+                                      <span style="color:${color}; font-weight:bold;">${log.status}</span><br>
+                                      <small>${log.time}</small>`;
+                    logListDiv.appendChild(item);
+                });
+            } catch (error) {
+                console.error("خطأ في جلب البيانات:", error);
+            }
+        }
+
+        // دالة لفحص الكارت وتحديد السماحية
+        async function simulateScan() {
+            let cardId = document.getElementById("cardInput").value.trim().toUpperCase();
+            let statusDiv = document.getElementById("status");
+
+            if (!cardId) {
+                statusDiv.style.color = "orange";
+                statusDiv.textContent = "⚠️ الرجاء إدخال رقم الكارت!";
+                return;
+            }
+
+            let studentName = "";
+            let status = "";
+
+            // التحقق هل الكارت موجود في قائمة الطلاب المسموح لهم؟
+            if (allowedStudents[cardId]) {
+                studentName = allowedStudents[cardId];
+                status = "مسموح بالدخول ✅";
+                statusDiv.style.color = "green";
+                statusDiv.textContent = `تم التعرف: ${studentName} (${status})`;
+            } else {
+                studentName = "غير معروف / كارت غير مسجل";
+                status = "مرفوض ❌";
+                statusDiv.style.color = "red";
+                statusDiv.textContent = `الكارت ${cardId} غير مسجل! (${status})`;
+            }
+
+            try {
+                // جلب السجلات القديمة من السحابة
+                let responseGet = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                    headers: { "X-Master-Key": API_KEY }
+                });
+                let dataGet = await responseGet.json();
+                let currentLogs = dataGet.record.logs || [];
+
+                // إضافة السجل الجديد مع اسم الطالب والحالة والوقت
+                currentLogs.push({
+                    cardId: cardId,
+                    studentName: studentName,
+                    status: status,
+                    time: new Date().toLocaleString("ar-IQ")
+                });
+
+                // رفع البيانات السحابية المحدثة إلى JSONbin
+                let responsePut = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Master-Key": API_KEY
+                    },
+                    body: JSON.stringify({ logs: currentLogs })
+                });
+
+                if (responsePut.ok) {
+                    document.getElementById("cardInput").value = "";
+                    fetchLogs(); // تحديث القائمة فوراً
+                }
+
+            } catch (error) {
+                console.error("حدث خطأ أثناء حفظ البيانات:", error);
+            }
+        }
+
+        window.onload = fetchLogs;
+    </script>
+</body>
+</html>
