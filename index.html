@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نظام التحكم بالوصول السحابي مع لعبة الحية والدرج</title>
+  <title>مشروع تخرج: نظام التحكم بالوصول السحابي</title>
   <style>
     :root {
       --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
@@ -60,11 +60,11 @@
     .card {
       background: var(--card-bg);
       backdrop-filter: blur(10px);
-      padding: 30px 20px;
+      padding: 25px 20px;
       border-radius: 20px;
       box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
       width: 100%;
-      max-width: 440px;
+      max-width: 480px;
       text-align: center;
       border: 1px solid rgba(255, 255, 255, 0.2);
       transition: all 0.4s ease;
@@ -80,7 +80,7 @@
     h2 {
       margin: 0;
       color: var(--text-main);
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 700;
     }
 
@@ -104,8 +104,8 @@
 
     p.subtitle {
       color: var(--text-sub);
-      font-size: 13px;
-      margin-bottom: 25px;
+      font-size: 12px;
+      margin-bottom: 20px;
       text-transform: uppercase;
       letter-spacing: 1px;
       font-weight: 600;
@@ -137,10 +137,10 @@
 
     .btn {
       width: 100%;
-      padding: 14px;
+      padding: 12px;
       border: none;
       border-radius: 12px;
-      font-size: 15px;
+      font-size: 14px;
       cursor: pointer;
       font-weight: 600;
       transition: all 0.3s ease;
@@ -173,9 +173,9 @@
     }
 
     .logs-container {
-      margin-top: 25px;
+      margin-top: 20px;
       background-color: var(--logs-bg);
-      padding: 15px;
+      padding: 12px;
       border-radius: 14px;
       text-align: right;
       border: 1px solid var(--border-color);
@@ -183,8 +183,8 @@
 
     .logs-title {
       font-weight: 700;
-      margin-bottom: 12px;
-      font-size: 14px;
+      margin-bottom: 10px;
+      font-size: 13px;
       color: var(--text-main);
       display: flex;
       align-items: center;
@@ -194,11 +194,11 @@
     .log-item {
       background: var(--log-item-bg);
       color: var(--text-main);
-      padding: 12px;
+      padding: 10px;
       border-radius: 10px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       border-right: 4px solid #cbd5e1;
-      font-size: 13px;
+      font-size: 12px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
 
@@ -211,9 +211,9 @@
     }
 
     .log-time {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--text-sub);
-      margin-top: 5px;
+      margin-top: 4px;
     }
 
     .btn-danger {
@@ -221,68 +221,90 @@
       background-color: rgba(239, 68, 68, 0.1);
       color: #ef4444;
       border: 1px solid rgba(239, 68, 68, 0.2);
-      padding: 10px;
+      padding: 8px;
       border-radius: 10px;
-      font-size: 13px;
+      font-size: 12px;
       cursor: pointer;
       font-weight: 600;
-      margin-top: 12px;
-      transition: background 0.2s;
+      margin-top: 10px;
     }
 
-    .btn-danger:hover {
-      background-color: rgba(239, 68, 68, 0.2);
-    }
-
-    /* صفحة الطالب واللعبة */
     #studentsPage {
       display: none;
       text-align: right;
     }
 
-    .game-container {
+    .peers-box {
       background: var(--input-bg);
-      border: 2px solid var(--border-color);
-      border-radius: 14px;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
       padding: 12px;
       margin-bottom: 15px;
-      text-align: center;
+      max-height: 220px;
+      overflow-y: auto;
     }
 
-    .board-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 4px;
-      margin-bottom: 10px;
-    }
-
-    .cell {
+    .peer-card-btn {
+      display: block;
+      width: 100%;
       background: var(--log-item-bg);
       color: var(--text-main);
       border: 1px solid var(--border-color);
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: bold;
-      height: 32px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-    }
-
-    .cell.player-here {
-      background: var(--primary) !important;
-      color: white !important;
-    }
-
-    .dice-area {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      margin-top: 10px;
+      padding: 10px 14px;
+      border-radius: 10px;
       font-size: 13px;
-      font-weight: bold;
+      margin-bottom: 8px;
+      font-weight: 600;
+      text-align: right;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .peer-card-btn:hover {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    #projectInfoPage {
+      display: none;
+      text-align: right;
+      max-height: 420px;
+      overflow-y: auto;
+      padding-left: 5px;
+    }
+
+    .info-section {
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      font-size: 12px;
       color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    .info-section h4 {
+      margin: 0 0 5px 0;
+      color: var(--primary);
+      font-size: 13px;
+    }
+
+    /* واجهة محاكي لوحة تحكم السحابة (Dashboard Simulator) */
+    .cloud-dashboard-sim {
+      background: #1e293b;
+      color: #f8fafc;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      font-family: monospace;
+      text-align: left;
+      direction: ltr;
+      font-size: 11px;
+      border: 1px solid #334155;
     }
   </style>
 </head>
@@ -290,56 +312,88 @@
 
   <div class="card">
     
-    <!-- الواجهة الأولى: فحص الكارت -->
+    <!-- 1. الشاشة الرئيسية: تسجيل الدخول والسجلات -->
     <div id="mainPage">
       <div class="header-flex">
         <h2>نظام التحكم الأمني</h2>
-        <button class="theme-btn" onclick="toggleTheme()">🎨 تغيير الثيم</button>
+        <button class="theme-btn" onclick="toggleTheme()">🎨 الثيم</button>
       </div>
-      <p class="subtitle">Secure Cloud Access System</p>
+      <p class="subtitle">Cloud Access Control System</p>
 
       <div class="input-group">
-        <input type="password" id="cardInput" placeholder="أدخل رقم الكارت السري">
+        <input type="password" id="cardInput" placeholder="أدخل كارتك السري (مثل: C006)">
       </div>
       
       <button class="btn btn-primary" onclick="checkCard()">
         <span>فحص الكارت وتسجيل الدخول</span> 🔒
       </button>
       <button class="btn btn-secondary" onclick="changeCardCode()">
-        <span>تغيير الكود الخاص</span> 🔄
+        <span>تغيير الكود الخاص بك</span> 🔄
       </button>
 
       <div class="logs-container">
         <div class="logs-title">
           <span>السجلات السحابية الآمنة</span>
-          <span>🔒</span>
+          <span>📊</span>
         </div>
         <div id="logsList">جاري تحميل السجلات...</div>
-        
         <button class="btn-danger" onclick="clearLogs()">مسح جميع السجلات 🗑️</button>
       </div>
     </div>
 
-    <!-- الواجهة الثانية: لوحة الطالب ولعبة الحية والدرج -->
+    <!-- 2. لوحة الطالب: عرض أسماء الطلاب -->
     <div id="studentsPage">
-      <h2>منطقة التسلية والترفيه</h2>
-      <p class="subtitle" id="welcomeMsg" style="color: var(--primary); font-weight: 600;"></p>
-      
-      <div class="game-container">
-        <h3 style="margin: 0 0 8px 0; color:var(--text-main); font-size:14px;">🐍 لعبة الحية والدرج 🪜</h3>
-        <p style="font-size: 11px; color: var(--text-sub); margin-bottom: 8px;">السلالم تصعد بك (🟢)، والحيات تعيدك للأسفل (🔴). الوصل للخانة 25 يفوز.</p>
-        
-        <!-- لوحة اللعب (25 خانة) -->
-        <div class="board-grid" id="boardGrid"></div>
+      <div class="header-flex">
+        <h2 id="welcomeMsg">أهلاً بك</h2>
+        <button class="theme-btn" onclick="goBackToMain()">خروج ⬅️</button>
+      </div>
+      <p class="subtitle">اضغط على اسمك لعرض تفاصيل السحابة والتحكم</p>
 
-        <div class="dice-area">
-          <span>النرْد: <span id="diceVal" style="color:var(--primary); font-size:16px;">-</span></span>
-          <button class="theme-btn" style="padding: 8px 16px; background:var(--primary); color:white;" onclick="rollDice()">🎲 ارمِ النرد</button>
+      <div style="font-size: 12px; font-weight:700; margin-bottom:8px; color:var(--text-sub); text-align:right;">قائمة أعضاء الفريق (اضغط على اسمك لعرض التوثيق):</div>
+      <div class="peers-box" id="peersListContainer">
+        جاري التحميل...
+      </div>
+    </div>
+
+    <!-- 3. صفحة تفاصيل المشروع وواجهة محاكاة لوحة تحكم السحابة (JSONbin Dashboard) -->
+    <div id="projectInfoPage">
+      <div class="header-flex">
+        <h2>توثيق مشروع التخرج</h2>
+        <button class="theme-btn" onclick="backToStudentDashboard()">رجوع ⬅️</button>
+      </div>
+      <p class="subtitle" id="profileTitle">محاكي لوحة تحكم السحابة للجنة</p>
+
+      <!-- محاكاة واجهة لوحة تحكم موقع JSONbin.io بداخل التطبيق -->
+      <div class="cloud-dashboard-sim">
+        <div style="color: #38bdf8; font-weight: bold; margin-bottom: 6px; border-bottom: 1px solid #334155; padding-bottom: 4px;">
+          ☁️ JSONbin.io Cloud Dashboard Simulator
         </div>
-        <div id="gameStatus" style="font-size: 12px; margin-top: 8px; color: var(--text-main); font-weight: 600;">ابدأ برمي النرد للتحرك!</div>
+        <div><b>Active Bin ID:</b> 6ad63709ffd5d1605379280a</div>
+        <div><b>Connection Status:</b> <span style="color: #4ade80;">Connected & Synced</span></div>
+        <div><b>API Authentication:</b> Bearer Token Active ($2a$10$...)</div>
+        <div><b>Storage Protocol:</b> HTTPS / REST API JSON</div>
       </div>
 
-      <button class="btn btn-primary" onclick="goBackToMain()">تسجيل الخروج والرجوع ⬅️</button>
+      <!-- زر الانتقال الفعلي لموقع JSONbin.io/app/bins اللي طلبته -->
+      <div style="margin-bottom: 12px;">
+        <a href="https://jsonbin.io/app/bins" target="_blank" class="btn" style="background: #0284c7; color: white; text-decoration: none; font-size: 13px; padding: 12px;">
+          <span>🌐 الانتقال إلى لوحة تحكم JSONbin الحقيقية</span>
+        </a>
+      </div>
+
+      <div class="info-section">
+        <h4>1. فكرة المشروع ونطاقه</h4>
+        تطوير نظام تحكم سحابي ذكي للوصول الآمن، يربط بين الأجهزة الذكية والواجهات السحابية، مصمم خصيصاً لمشاريع تخرج الكليات التقنية.
+      </div>
+
+      <div class="info-section">
+        <h4>2. الهيكلية والتقنيات المُستخدمة</h4>
+        • <b>واجهة المستخدم (Frontend):</b> HTML5, CSS3, JavaScript مع نظام ثيمات متعدد.<br>
+        • <b>الاستضافة (Hosting):</b> مستضاف عبر <b>GitHub Pages</b>.<br>
+        • <b>قاعدة البيانات (Cloud Database):</b> مربوطة بشكل حقيقي ومباشر مع سحابة <b>JSONbin.io</b> لحفظ الأكواد والسجلات وتحديثها لحظياً.
+      </div>
+
+      <button class="btn btn-primary" onclick="backToStudentDashboard()">العودة لقائمة الفريق ↩️</button>
     </div>
 
   </div>
@@ -358,75 +412,7 @@
     };
 
     let allowedStudents = {};
-    let playerPos = 1;
-    const winningSquare = 25;
-    const snakesAndLadders = {
-      3: 11,   
-      9: 15,   
-      18: 6,   
-      22: 12   
-    };
-
-    function initBoard() {
-      const grid = document.getElementById("boardGrid");
-      if (!grid) return;
-      grid.innerHTML = "";
-      for (let i = 25; i >= 1; i--) {
-        const cell = document.createElement("div");
-        cell.className = "cell";
-        cell.id = `cell-${i}`;
-        
-        let label = i;
-        if (i === 3 || i === 9) label += " 🟢🪜";
-        if (i === 18 || i === 22) label += " 🔴🐍";
-        if (i === 25) label += " 🏆";
-        
-        cell.innerText = label;
-        grid.appendChild(cell);
-      }
-      updatePlayerPosition();
-    }
-
-    function updatePlayerPosition() {
-      for (let i = 1; i <= 25; i++) {
-        const c = document.getElementById(`cell-${i}`);
-        if (c) c.classList.remove("player-here");
-      }
-      const activeCell = document.getElementById(`cell-${playerPos}`);
-      if (activeCell) activeCell.classList.add("player-here");
-    }
-
-    function rollDice() {
-      const dice = Math.floor(Math.random() * 6) + 1;
-      const diceValEl = document.getElementById("diceVal");
-      if (diceValEl) diceValEl.innerText = dice;
-      
-      playerPos += dice;
-      let statusText = `رميت النرد وظهر: ${dice}. تقدمت للخانة ${playerPos}.`;
-
-      if (playerPos > winningSquare) {
-        playerPos = winningSquare;
-      }
-
-      if (snakesAndLadders[playerPos]) {
-        let oldPos = playerPos;
-        playerPos = snakesAndLadders[playerPos];
-        if (playerPos > oldPos) {
-          statusText += ` ممتاز! صعدت عبر الدرج من ${oldPos} إلى ${playerPos} 🟢🪜`;
-        } else {
-          statusText += ` حظ سيء! نزلت بسبب الحية من ${oldPos} إلى ${playerPos} 🔴🐍`;
-        }
-      }
-
-      if (playerPos === winningSquare) {
-        statusText = "🎉 مبروك! لقد فزت ووصلت لنهاية اللعبة بنجاح!";
-        alert("مبروك فوزك بلعبة الحية والدرج داخل النظام!");
-      }
-
-      const gameStatusEl = document.getElementById("gameStatus");
-      if (gameStatusEl) gameStatusEl.innerText = statusText;
-      updatePlayerPosition();
-    }
+    let loggedInStudentName = "";
 
     function toggleTheme() {
       const body = document.body;
@@ -445,35 +431,25 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       const savedTheme = localStorage.getItem('app_theme');
-      if (savedTheme === 'green') {
-        document.body.classList.add('theme-green');
-      } else if (savedTheme === 'light') {
-        document.body.classList.add('theme-light');
-      }
+      if (savedTheme === 'green') document.body.classList.add('theme-green');
+      else if (savedTheme === 'light') document.body.classList.add('theme-light');
     });
 
     async function initData() {
       try {
-        const res = await fetch(API_URL, {
-          headers: { "X-Master-Key": API_KEY }
-        });
+        const res = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
         const data = await res.json();
-        
         if (!data.record.students) {
           allowedStudents = defaultStudents;
           await fetch(API_URL, {
             method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Master-Key": API_KEY
-            },
+            headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
             body: JSON.stringify({ logs: data.record.logs || [], students: allowedStudents })
           });
         } else {
           allowedStudents = data.record.students;
         }
       } catch (err) {
-        console.error("خطأ في تهيئة البيانات:", err);
         allowedStudents = defaultStudents;
       }
       fetchLogs();
@@ -488,71 +464,57 @@
       const logsList = document.getElementById("logsList");
       if (!logsList) return;
       try {
-        const res = await fetch(API_URL, {
-          headers: { "X-Master-Key": API_KEY }
-        });
+        const res = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
         const data = await res.json();
         const logs = data.record.logs || [];
-
         if (logs.length === 0) {
-          logsList.innerHTML = "<p style='text-align:center; color:var(--text-sub); font-size:12px;'>لا توجد سجلات حالياً</p>";
+          logsList.innerHTML = "<p style='text-align:center; color:var(--text-sub); font-size:11px;'>لا توجد سجلات حالياً</p>";
           return;
         }
-
         logsList.innerHTML = "";
-        logs.slice(-10).reverse().forEach(log => {
+        logs.slice(-8).reverse().forEach(log => {
           const div = document.createElement("div");
           const isPermitted = log.status === "مسموح بالدخول";
           div.className = `log-item ${isPermitted ? "permitted" : "denied"}`;
-          
-          const maskedCard = maskCard(log.card);
-
           div.innerHTML = `
             <div style="font-weight:600;">${log.name}</div>
-            <div style="display:flex; justify-content:space-between; margin-top:4px;">
-              <span>الكارت: ${maskedCard}</span>
-              <span style="color: ${isPermitted ? '#10b981' : '#ef4444'}; font-weight:bold;">${log.status} ${isPermitted ? '✅' : '❌'}</span>
+            <div style="display:flex; justify-content:space-between; margin-top:2px;">
+              <span>الكارت: ${maskCard(log.card)}</span>
+              <span style="color: ${isPermitted ? '#10b981' : '#ef4444'}; font-weight:bold;">${log.status}</span>
             </div>
             <div class="log-time">${log.timestamp}</div>
           `;
           logsList.appendChild(div);
         });
       } catch (err) {
-        console.error("خطأ في التحميل:", err);
-        logsList.innerHTML = "<p style='color:red; font-size:12px;'>خطأ في تحميل السجلات</p>";
+        logsList.innerHTML = "<p style='color:red; font-size:11px;'>خطأ في التحميل</p>";
       }
     }
 
     async function checkCard() {
       const input = document.getElementById("cardInput");
       const cardCode = input.value.trim().toUpperCase();
-
-      if (!cardCode) {
-        alert("يرجى إدخال رقم الكارت!");
-        return;
-      }
+      if (!cardCode) { alert("أدخل رقم الكارت!"); return; }
 
       const name = allowedStudents[cardCode];
       const isPermitted = Boolean(name);
-      const status = isPermitted ? "مسموح بالدخول" : "مرفوض";
-      const timestamp = new Date().toLocaleString("ar-IQ");
-
-      const newLog = { card: cardCode, name: (name || "محاولة دخول غير مصرح بها"), status: status, timestamp: timestamp };
+      const newLog = { 
+        card: cardCode, 
+        name: (name || "محاولة دخول غير مرخص"), 
+        status: isPermitted ? "مسموح بالدخول" : "مرفوض", 
+        timestamp: new Date().toLocaleString("ar-IQ") 
+      };
 
       try {
         const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
         const dataGet = await resGet.json();
         let currentLogs = dataGet.record.logs || [];
         let studentsData = dataGet.record.students || allowedStudents;
-
         currentLogs.push(newLog);
 
         await fetch(API_URL, {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Master-Key": API_KEY
-          },
+          headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
           body: JSON.stringify({ logs: currentLogs, students: studentsData })
         });
 
@@ -560,26 +522,57 @@
         fetchLogs();
 
         if (isPermitted) {
-          playerPos = 1;
+          loggedInStudentName = name;
           showStudentsPage(name);
         } else {
           alert("الكارت غير مسجل! تم رفض الدخول ❌");
         }
       } catch (err) {
-        console.error("خطأ أثناء الحفظ:", err);
-        alert("حدث خطأ أثناء الاتصال بالسحابة!");
+        alert("خطأ بالاتصال بالسحابة!");
       }
     }
 
     function showStudentsPage(studentName) {
       document.getElementById("mainPage").style.display = "none";
+      document.getElementById("projectInfoPage").style.display = "none";
       document.getElementById("studentsPage").style.display = "block";
-      document.getElementById("welcomeMsg").innerText = `أهلاً بك يا ${studentName}`;
-      initBoard();
+      document.getElementById("welcomeMsg").innerText = `مرحباً بك: ${studentName}`;
+      
+      const container = document.getElementById("peersListContainer");
+      container.innerHTML = "";
+      
+      Object.values(allowedStudents).forEach(sName => {
+        const btn = document.createElement("button");
+        btn.className = "peer-card-btn";
+        if (sName === studentName) {
+          btn.innerHTML = `⭐ ${sName} (هذا أنت - اضغط لعرض محاكي السحابة ولوحة التحكم)`;
+          btn.style.borderColor = "var(--primary)";
+          btn.style.background = "rgba(79, 70, 229, 0.08)";
+          btn.onclick = () => showProjectInfo(sName);
+        } else {
+          btn.innerHTML = `👤 ${sName}`;
+          btn.onclick = () => {
+            alert(`هذا زميلك في الفريق: ${sName}\n(اضغط على اسمك أنت لعرض لوحة تحكم السحابة).`);
+          };
+        }
+        container.appendChild(btn);
+      });
+    }
+
+    function showProjectInfo(sName) {
+      document.getElementById("studentsPage").style.display = "none";
+      document.getElementById("projectInfoPage").style.display = "block";
+      document.getElementById("profileTitle",).innerText = `ملف الطالب: ${sName} | لوحة تحكم وإثبات السحابة`;
+    }
+
+    function backToStudentDashboard() {
+      document.getElementById("projectInfoPage").style.display = "none";
+      document.getElementById("studentsPage").style.display = "block";
     }
 
     function goBackToMain() {
       document.getElementById("studentsPage").style.display = "none";
+      document.getElementById("projectInfoPage").style.display = "none";
       document.getElementById("mainPage").style.display = "block";
       fetchLogs();
     }
@@ -587,77 +580,46 @@
     async function changeCardCode() {
       const oldCode = prompt("أدخل كارتك الحالي (القديم):");
       if (!oldCode) return;
-
       const trimmedOld = oldCode.trim().toUpperCase();
-
-      if (!allowedStudents[trimmedOld]) {
-        alert("الكارت القديم غير موجود في النظام!");
-        return;
-      }
-
-      const studentName = allowedStudents[trimmedOld];
-      const newCode = prompt(`أهلاً بك (${studentName}). أدخل الكود الجديد المخصص لك:`);
+      if (!allowedStudents[trimmedOld]) { alert("الكود القديم غير موجود!"); return; }
       
+      const sName = allowedStudents[trimmedOld];
+      const newCode = prompt(`مرحباً ${sName}. أدخل الكود الجديد المخصص لك:`);
       if (!newCode) return;
-
       const trimmedNew = newCode.trim().toUpperCase();
+      if (allowedStudents[trimmedNew]) { alert("الكود الجديد مستخدم لشخص آخر!"); return; }
 
-      if (allowedStudents[trimmedNew]) {
-        alert("هذا الكود الجديد مستخدم بالفعل لشخص آخر!");
-        return;
-      }
-
-      allowedStudents[trimmedNew] = studentName;
+      allowedStudents[trimmedNew] = sName;
       delete allowedStudents[trimmedOld];
 
       try {
         const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
         const dataGet = await resGet.json();
-        let currentLogs = dataGet.record.logs || [];
-
         await fetch(API_URL, {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Master-Key": API_KEY
-          },
-          body: JSON.stringify({ logs: currentLogs, students: allowedStudents })
+          headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
+          body: JSON.stringify({ logs: dataGet.record.logs || [], students: allowedStudents })
         });
-
-        alert(`تم تغيير الكود بنجاح يا ${studentName}!\nكودك الجديد هو: ${trimmedNew}`);
+        alert(`تم تحديث الكود بنجاح يا ${sName}!`);
         fetchLogs();
       } catch (err) {
-        console.error("خطأ في تحديث الكود:", err);
-        alert("حدث خطأ أثناء حفظ الكود الجديد في السحابة!");
+        alert("فشل تحديث الكود في السحابة!");
       }
     }
 
     async function clearLogs() {
-      if (!confirm("هل أنت متأكد من مسح جميع السجلات نهائياً؟")) return;
-
+      if (!confirm("هل تريد مسح السجلات؟")) return;
       try {
         const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
         const dataGet = await resGet.json();
-        let studentsData = dataGet.record.students || allowedStudents;
-
-        const res = await fetch(API_URL, {
+        await fetch(API_URL, {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Master-Key": API_KEY
-          },
-          body: JSON.stringify({ logs: [], students: studentsData })
+          headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
+          body: JSON.stringify({ logs: [], students: dataGet.record.students || allowedStudents })
         });
-
-        if (res.ok) {
-          alert("تم مسح السجلات بنجاح!");
-          fetchLogs();
-        } else {
-          alert("فشل مسح السجلات!");
-        }
+        fetchLogs();
       } catch (err) {
-        console.error("خطأ في المسح:", err);
-        alert("حدث خطأ أثناء مسح السجلات!");
+        alert("فشل مسح السجلات!");
       }
     }
 
