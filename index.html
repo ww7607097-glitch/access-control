@@ -113,16 +113,16 @@
 
     .input-group {
       position: relative;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
     }
 
-    input[type="password"] {
+    input[type="password"], input[type="text"] {
       width: 100%;
-      padding: 14px 15px;
+      padding: 12px 15px;
       border: 2px solid var(--border-color);
       border-radius: 12px;
       box-sizing: border-box;
-      font-size: 16px;
+      font-size: 14px;
       text-align: center;
       outline: none;
       transition: all 0.3s ease;
@@ -130,7 +130,7 @@
       color: var(--text-main);
     }
 
-    input[type="password"]:focus {
+    input[type="password"]:focus, input[type="text"]:focus {
       border-color: var(--primary);
       box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
     }
@@ -229,7 +229,7 @@
       margin-top: 10px;
     }
 
-    #studentsPage {
+    #studentsPage, #adminDashboardPage {
       display: none;
       text-align: right;
     }
@@ -279,32 +279,47 @@
     .info-section {
       background: var(--input-bg);
       border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 10px 12px;
-      margin-bottom: 10px;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 15px;
       font-size: 12px;
       color: var(--text-main);
       line-height: 1.6;
     }
 
     .info-section h4 {
-      margin: 0 0 5px 0;
+      margin: 0 0 10px 0;
       color: var(--primary);
       font-size: 13px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 6px;
     }
 
-    /* واجهة محاكي لوحة تحكم السحابة (Dashboard Simulator) */
     .cloud-dashboard-sim {
       background: #1e293b;
       color: #f8fafc;
       border-radius: 12px;
       padding: 12px;
-      margin-bottom: 12px;
+      margin-bottom: 15px;
       font-family: monospace;
       text-align: left;
       direction: ltr;
       font-size: 11px;
       border: 1px solid #334155;
+    }
+
+    /* تنسيق بطاقات قائمة الطلاب داخل لوحة الإدارة لمنع التداخل وترتيبها بشكل ممتاز */
+    .admin-student-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--log-item-bg);
+      border: 1px solid var(--border-color);
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      font-size: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
   </style>
 </head>
@@ -321,7 +336,7 @@
       <p class="subtitle">Cloud Access Control System</p>
 
       <div class="input-group">
-        <input type="password" id="cardInput" placeholder="أدخل كارتك السري (مثل: C006)">
+        <input type="password" id="cardInput" placeholder="أدخل كارتك أو كود المشرف">
       </div>
       
       <button class="btn btn-primary" onclick="checkCard()">
@@ -341,13 +356,56 @@
       </div>
     </div>
 
-    <!-- 2. لوحة الطالب: عرض أسماء الطلاب -->
+    <!-- 2. لوحة تحكم الإدارة -->
+    <div id="adminDashboardPage">
+      <div class="header-flex">
+        <h2 id="adminTitleHeader">🛡️ لوحة الإدارة</h2>
+        <button class="theme-btn" onclick="goBackToMain()">خروج ⬅️</button>
+      </div>
+      <p class="subtitle" id="adminSubtitle">إدارة النظام سحابياً</p>
+
+      <div class="cloud-dashboard-sim">
+        <div style="color: #38bdf8; font-weight: bold; margin-bottom: 4px;">☁️ JSONbin.io Cloud DB</div>
+        <div id="adminRoleDisplay">إدارة صلبة ومتزامنة</div>
+      </div>
+
+      <!-- قسم إضافة طالب جديد (بطاقة مستقلة ومنظمة) -->
+      <div class="info-section" style="text-align: right;">
+        <h4>➕ إضافة طالب جديد</h4>
+        <div class="input-group" style="margin-bottom: 8px;">
+          <input type="text" id="adminNewName" placeholder="اسم الطالب الجديد">
+        </div>
+        <div class="input-group" style="margin-bottom: 10px;">
+          <input type="text" id="adminNewCode" placeholder="الكود السري (مثل: C011)">
+        </div>
+        <button class="btn btn-primary" onclick="adminAddStudent()" style="background: var(--primary); font-size: 13px; padding: 10px; margin-bottom: 0;">
+          <span>حفظ الطالب وكوده في السحابة</span>
+        </button>
+      </div>
+
+      <!-- قسم إدارة الأدوار (بطاقة مستقلة ومنظمة بمساحة مريحة) -->
+      <div class="info-section" style="text-align: right;" id="rolesManagementSection">
+        <h4 id="rolesSectionTitle">👑 إدارة أدوار وحسابات الطلاب</h4>
+        <p style="font-size: 11px; color: var(--text-sub); margin-bottom: 10px;">تغيير أدوار الفريق:</p>
+        <div id="adminManageList" style="max-height: 180px; overflow-y: auto; padding-left: 4px;">
+          جاري التحميل...
+        </div>
+      </div>
+
+      <div style="margin-top: 15px;">
+        <a href="https://jsonbin.io/app/bins" target="_blank" class="btn" style="background: #0284c7; color: white; text-decoration: none; font-size: 12px; padding: 10px;">
+          <span>🌐 فتح موقع السحابة الرسمي (JSONbin)</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- 3. لوحة الطالب: عرض أسماء الطلاب -->
     <div id="studentsPage">
       <div class="header-flex">
         <h2 id="welcomeMsg">أهلاً بك</h2>
         <button class="theme-btn" onclick="goBackToMain()">خروج ⬅️</button>
       </div>
-      <p class="subtitle">اضغط على اسمك لعرض تفاصيل السحابة والتحكم</p>
+      <p class="subtitle">اضغط على اسمك لعرض التوثيق</p>
 
       <div style="font-size: 12px; font-weight:700; margin-bottom:8px; color:var(--text-sub); text-align:right;">قائمة أعضاء الفريق (اضغط على اسمك لعرض التوثيق):</div>
       <div class="peers-box" id="peersListContainer">
@@ -355,42 +413,30 @@
       </div>
     </div>
 
-    <!-- 3. صفحة تفاصيل المشروع وواجهة محاكاة لوحة تحكم السحابة (JSONbin Dashboard) -->
+    <!-- 4. صفحة تفاصيل المشروع وربط السحابة -->
     <div id="projectInfoPage">
       <div class="header-flex">
         <h2>توثيق مشروع التخرج</h2>
         <button class="theme-btn" onclick="backToStudentDashboard()">رجوع ⬅️</button>
       </div>
-      <p class="subtitle" id="profileTitle">محاكي لوحة تحكم السحابة للجنة</p>
+      <p class="subtitle" id="profileTitle">إثبات الربط السحابي الرسمي</p>
 
-      <!-- محاكاة واجهة لوحة تحكم موقع JSONbin.io بداخل التطبيق -->
-      <div class="cloud-dashboard-sim">
-        <div style="color: #38bdf8; font-weight: bold; margin-bottom: 6px; border-bottom: 1px solid #334155; padding-bottom: 4px;">
-          ☁️ JSONbin.io Cloud Dashboard Simulator
-        </div>
-        <div><b>Active Bin ID:</b> 6ad63709ffd5d1605379280a</div>
-        <div><b>Connection Status:</b> <span style="color: #4ade80;">Connected & Synced</span></div>
-        <div><b>API Authentication:</b> Bearer Token Active ($2a$10$...)</div>
-        <div><b>Storage Protocol:</b> HTTPS / REST API JSON</div>
-      </div>
-
-      <!-- زر الانتقال الفعلي لموقع JSONbin.io/app/bins اللي طلبته -->
       <div style="margin-bottom: 12px;">
-        <a href="https://jsonbin.io/app/bins" target="_blank" class="btn" style="background: #0284c7; color: white; text-decoration: none; font-size: 13px; padding: 12px;">
-          <span>🌐 الانتقال إلى لوحة تحكم JSONbin الحقيقية</span>
+        <a href="https://jsonbin.io/app/bins" target="_blank" class="btn" style="background: #0284c7; color: white; text-decoration: none; font-size: 12px; padding: 10px;">
+          <span>🌐 فتح موقع سحابة JSONbin الرسمي</span>
         </a>
       </div>
 
       <div class="info-section">
         <h4>1. فكرة المشروع ونطاقه</h4>
-        تطوير نظام تحكم سحابي ذكي للوصول الآمن، يربط بين الأجهزة الذكية والواجهات السحابية، مصمم خصيصاً لمشاريع تخرج الكليات التقنية.
+        تطوير نظام تحكم سحابي ذكي للوصول الآمن وإدارة الأدوار والأكواد السحابية عبر الإنترنت.
       </div>
 
       <div class="info-section">
         <h4>2. الهيكلية والتقنيات المُستخدمة</h4>
-        • <b>واجهة المستخدم (Frontend):</b> HTML5, CSS3, JavaScript مع نظام ثيمات متعدد.<br>
-        • <b>الاستضافة (Hosting):</b> مستضاف عبر <b>GitHub Pages</b>.<br>
-        • <b>قاعدة البيانات (Cloud Database):</b> مربوطة بشكل حقيقي ومباشر مع سحابة <b>JSONbin.io</b> لحفظ الأكواد والسجلات وتحديثها لحظياً.
+        • <b>واجهة المستخدم (Frontend):</b> HTML5, CSS3, JavaScript.<br>
+        • <b>الاستضافة (Hosting):</b> عبر <b>GitHub Pages</b>.<br>
+        • <b>قاعدة البيانات (Cloud Database):</b> <b>JSONbin.io API</b>.
       </div>
 
       <button class="btn btn-primary" onclick="backToStudentDashboard()">العودة لقائمة الفريق ↩️</button>
@@ -404,15 +450,15 @@
     const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
     const defaultStudents = {
-      "C006": "محمد خضر",
-      "C007": "عبدالله خضر",
-      "C008": "حسين علي عتيب",
-      "C009": "حسين عبدالكريم",
-      "C010": "احمد عبدالرحمان"
+      "00000": { name: "محمد خضر", role: "المالك" },
+      "C007": { name: "عبدالله خضر", role: "المالك" },
+      "C008": { name: "حسين علي عتيب", role: "طالب فقط" },
+      "C009": { name: "حسين عبدالكريم", role: "طالب فقط" },
+      "C010": { name: "احمد عبدالرحمان", role: "مشرف" }
     };
 
     let allowedStudents = {};
-    let loggedInStudentName = "";
+    const MASTER_OWNER_CODE = "00000";
 
     function toggleTheme() {
       const body = document.body;
@@ -440,17 +486,43 @@
         const res = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
         const data = await res.json();
         if (!data.record.students) {
-          allowedStudents = defaultStudents;
+          let formattedStudents = {};
+          for (let [k, v] of Object.entries(defaultStudents)) {
+            formattedStudents[k] = typeof v === 'object' ? v : { name: v, role: "طالب فقط" };
+          }
+          allowedStudents = formattedStudents;
           await fetch(API_URL, {
             method: "PUT",
             headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
             body: JSON.stringify({ logs: data.record.logs || [], students: allowedStudents })
           });
         } else {
-          allowedStudents = data.record.students;
+          let loaded = data.record.students;
+          let formattedStudents = {};
+          for (let [k, v] of Object.entries(loaded)) {
+            if (typeof v === 'string') {
+              formattedStudents[k] = { name: v, role: "طالب فقط" };
+            } else {
+              let cleanedRole = v.role;
+              if (cleanedRole === "مساعد" || cleanedRole === "محظور") cleanedRole = "طالب فقط";
+              formattedStudents[k] = { name: v.name, role: cleanedRole || "طالب فقط" };
+            }
+          }
+          if (!formattedStudents[MASTER_OWNER_CODE]) {
+            formattedStudents[MASTER_OWNER_CODE] = { name: "محمد خضر", role: "المالك" };
+          } else {
+            formattedStudents[MASTER_OWNER_CODE].role = "المالك";
+          }
+          allowedStudents = formattedStudents;
         }
       } catch (err) {
-        allowedStudents = defaultStudents;
+        allowedStudents = {
+          "00000": { name: "محمد خضر", role: "المالك" },
+          "C007": { name: "عبدالله خضر", role: "المالك" },
+          "C008": { name: "حسين علي عتيب", role: "طالب فقط" },
+          "C009": { name: "حسين عبدالكريم", role: "طالب فقط" },
+          "C010": { name: "احمد عبدالرحمان", role: "مشرف" }
+        };
       }
       fetchLogs();
     }
@@ -496,12 +568,15 @@
       const cardCode = input.value.trim().toUpperCase();
       if (!cardCode) { alert("أدخل رقم الكارت!"); return; }
 
-      const name = allowedStudents[cardCode];
-      const isPermitted = Boolean(name);
+      const studentObj = allowedStudents[cardCode];
+      const isRegistered = Boolean(studentObj);
+      const studentName = isRegistered ? studentObj.name : "محاولة دخول غير مرخص";
+      const studentRole = isRegistered ? (studentObj.role || "طالب فقط") : "";
+
       const newLog = { 
         card: cardCode, 
-        name: (name || "محاولة دخول غير مرخص"), 
-        status: isPermitted ? "مسموح بالدخول" : "مرفوض", 
+        name: studentName, 
+        status: isRegistered ? "مسموح بالدخول" : "مرفوض", 
         timestamp: new Date().toLocaleString("ar-IQ") 
       };
 
@@ -521,9 +596,12 @@
         input.value = "";
         fetchLogs();
 
-        if (isPermitted) {
-          loggedInStudentName = name;
-          showStudentsPage(name);
+        if (isRegistered) {
+          if (studentRole === "مشرف" || studentRole === "المالك") {
+            showAdminDashboard(studentName, cardCode, studentRole);
+          } else {
+            showStudentsPage(studentName);
+          }
         } else {
           alert("الكارت غير مسجل! تم رفض الدخول ❌");
         }
@@ -532,8 +610,166 @@
       }
     }
 
+    function showAdminDashboard(adminName, adminCode, adminRole) {
+      document.getElementById("mainPage").style.display = "none";
+      document.getElementById("studentsPage").style.display = "none";
+      document.getElementById("projectInfoPage").style.display = "none";
+      document.getElementById("adminDashboardPage").style.display = "block";
+      
+      document.getElementById("adminTitleHeader").innerText = `🛡️ لوحة إدارة: ${adminName}`;
+      document.getElementById("adminSubtitle").innerText = `الدور الحالي: ${adminRole}`;
+      document.getElementById("adminRoleDisplay").innerText = `الدور: ${adminRole} | الاسم: ${adminName}`;
+
+      const rolesTitle = document.getElementById("rolesSectionTitle");
+
+      if (adminRole === "مشرف") {
+        rolesTitle.innerText = "📋 قائمة طلاب الفريق (إضافة طلاب جدد فقط)";
+      } else {
+        rolesTitle.innerText = "👑 إدارة أدوار وحسابات الطلاب";
+      }
+
+      renderAdminManageList(adminCode, adminRole);
+    }
+
+    function renderAdminManageList(currentAdminCode, currentAdminRole) {
+      const listContainer = document.getElementById("adminManageList");
+      listContainer.innerHTML = "";
+      
+      for (const [code, val] of Object.entries(allowedStudents)) {
+        const name = typeof val === 'object' ? val.name : val;
+        let role = typeof val === 'object' ? (val.role || "طالب فقط") : "طالب فقط";
+        if (role === "مساعد" || role === "محظور") role = "طالب فقط";
+
+        const row = document.createElement("div");
+        row.className = "admin-student-row";
+        
+        let actionControls = '';
+
+        if (code === MASTER_OWNER_CODE) {
+          actionControls = `<span style="color:#10b981; font-weight:bold; font-size:11px;">محمي (المالك الأساسي)</span>`;
+        } 
+        else if (currentAdminRole === "مشرف" && (role === "مشرف" || role === "المالك")) {
+          actionControls = `<span style="color:#4f46e5; font-weight:bold; font-size:11px;">${role} (محمي)</span>`;
+        } 
+        else if (currentAdminRole === "المالك") {
+          actionControls = `
+            <div style="display:flex; gap:5px; align-items:center;">
+              <select onchange="updateStudentRole('${code}', this.value)" style="font-size:11px; padding:4px 6px; border-radius:6px; border:1px solid var(--border-color); background:var(--input-bg); color:var(--text-main);">
+                <option value="المالك" ${role === 'المالك' ? 'selected' : ''}>المالك</option>
+                <option value="مشرف" ${role === 'مشرف' ? 'selected' : ''}>مشرف</option>
+                <option value="طالب فقط" ${role === 'طالب فقط' ? 'selected' : ''}>طالب فقط</option>
+              </select>
+              <button onclick="adminDeleteStudent('${code}', '${currentAdminCode}', '${currentAdminRole}')" style="background:#ef4444; color:white; border:none; padding:5px 8px; border-radius:6px; cursor:pointer; font-size:11px;">حذف</button>
+            </div>
+          `;
+        } else {
+          actionControls = `<span style="color:var(--text-sub); font-size:11px;">عرض فقط</span>`;
+        }
+
+        row.innerHTML = `
+          <div style="text-align:right;">
+            <b style="font-size:12px; color:var(--text-main);">${name}</b>
+            <div style="color:var(--primary); font-weight:600; font-size:11px; margin-top:2px;">الدور: ${role}</div>
+          </div>
+          <div>${actionControls}</div>
+        `;
+        listContainer.appendChild(row);
+      }
+    }
+
+    async function adminAddStudent() {
+      const nameInput = document.getElementById("adminNewName");
+      const codeInput = document.getElementById("adminNewCode");
+      const name = nameInput.value.trim();
+      const code = codeInput.value.trim().toUpperCase();
+
+      if (!name || !code) {
+        alert("أدخل اسم الطالب والكود الخاص به!");
+        return;
+      }
+
+      if (allowedStudents[code]) {
+        alert("هذا الكود مستخدم بالفعل لشخص آخر!");
+        return;
+      }
+
+      allowedStudents[code] = { name: name, role: "طالب فقط" };
+
+      try {
+        const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
+        const dataGet = await resGet.json();
+        
+        await fetch(API_URL, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
+          body: JSON.stringify({ logs: dataGet.record.logs || [], students: allowedStudents })
+        });
+
+        alert(`تم إضافة الطالب (${name}) بنجاح للسحابة!`);
+        nameInput.value = "";
+        codeInput.value = "";
+        
+        renderAdminManageList("00000", "المالك");
+      } catch (err) {
+        alert("فشل الحفظ في السحابة!");
+      }
+    }
+
+    async function updateStudentRole(code, newRole) {
+      if (code === MASTER_OWNER_CODE) {
+        alert("لا يمكن تغيير صلاحية المالك الأساسي!");
+        return;
+      }
+
+      if (allowedStudents[code]) {
+        allowedStudents[code].role = newRole;
+      }
+
+      try {
+        const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
+        const dataGet = await resGet.json();
+        
+        await fetch(API_URL, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
+          body: JSON.stringify({ logs: dataGet.record.logs || [], students: allowedStudents })
+        });
+
+        renderAdminManageList("00000", "المالك");
+      } catch (err) {
+        alert("فشل تحديث الدور في السحابة!");
+      }
+    }
+
+    async function adminDeleteStudent(code, currentAdminCode, currentAdminRole) {
+      if (code === MASTER_OWNER_CODE) {
+        alert("لا يمكن حذف المالك الأساسي أبداً!");
+        return;
+      }
+
+      if (!confirm(`هل أنت متأكد من حذف هذا الحساب؟`)) return;
+
+      delete allowedStudents[code];
+
+      try {
+        const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
+        const dataGet = await resGet.json();
+        
+        await fetch(API_URL, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
+          body: JSON.stringify({ logs: dataGet.record.logs || [], students: allowedStudents })
+        });
+
+        renderAdminManageList(currentAdminCode, currentAdminRole);
+      } catch (err) {
+        alert("فشل الحذف من السحابة!");
+      }
+    }
+
     function showStudentsPage(studentName) {
       document.getElementById("mainPage").style.display = "none";
+      document.getElementById("adminDashboardPage").style.display = "none";
       document.getElementById("projectInfoPage").style.display = "none";
       document.getElementById("studentsPage").style.display = "block";
       document.getElementById("welcomeMsg").innerText = `مرحباً بك: ${studentName}`;
@@ -541,18 +777,22 @@
       const container = document.getElementById("peersListContainer");
       container.innerHTML = "";
       
-      Object.values(allowedStudents).forEach(sName => {
+      Object.values(allowedStudents).forEach(val => {
+        const sName = typeof val === 'object' ? val.name : val;
+        let sRole = typeof val === 'object' ? (val.role || "طالب فقط") : "طالب فقط";
+        if (sRole === "مساعد" || sRole === "محظور") sRole = "طالب فقط";
+        
         const btn = document.createElement("button");
         btn.className = "peer-card-btn";
         if (sName === studentName) {
-          btn.innerHTML = `⭐ ${sName} (هذا أنت - اضغط لعرض محاكي السحابة ولوحة التحكم)`;
+          btn.innerHTML = `⭐ ${sName} [${sRole}] - هذا أنت (اضغط لعرض توثيق السحابة)`;
           btn.style.borderColor = "var(--primary)";
           btn.style.background = "rgba(79, 70, 229, 0.08)";
           btn.onclick = () => showProjectInfo(sName);
         } else {
-          btn.innerHTML = `👤 ${sName}`;
+          btn.innerHTML = `👤 ${sName} [${sRole}]`;
           btn.onclick = () => {
-            alert(`هذا زميلك في الفريق: ${sName}\n(اضغط على اسمك أنت لعرض لوحة تحكم السحابة).`);
+            alert(`هذا زميلك في الفريق: ${sName} [الدور: ${sRole}]\n(اضغط على اسمك أنت لعرض التوثيق).`);
           };
         }
         container.appendChild(btn);
@@ -562,7 +802,7 @@
     function showProjectInfo(sName) {
       document.getElementById("studentsPage").style.display = "none";
       document.getElementById("projectInfoPage").style.display = "block";
-      document.getElementById("profileTitle",).innerText = `ملف الطالب: ${sName} | لوحة تحكم وإثبات السحابة`;
+      document.getElementById("profileTitle").innerText = `ملف الطالب: ${sName} | إثبات الربط السحابي الرسمي`;
     }
 
     function backToStudentDashboard() {
@@ -572,6 +812,7 @@
 
     function goBackToMain() {
       document.getElementById("studentsPage").style.display = "none";
+      document.getElementById("adminDashboardPage").style.display = "none";
       document.getElementById("projectInfoPage").style.display = "none";
       document.getElementById("mainPage").style.display = "block";
       fetchLogs();
@@ -583,13 +824,15 @@
       const trimmedOld = oldCode.trim().toUpperCase();
       if (!allowedStudents[trimmedOld]) { alert("الكود القديم غير موجود!"); return; }
       
-      const sName = allowedStudents[trimmedOld];
+      const studentData = allowedStudents[trimmedOld];
+      const sName = typeof studentData === 'object' ? studentData.name : studentData;
+      
       const newCode = prompt(`مرحباً ${sName}. أدخل الكود الجديد المخصص لك:`);
       if (!newCode) return;
       const trimmedNew = newCode.trim().toUpperCase();
       if (allowedStudents[trimmedNew]) { alert("الكود الجديد مستخدم لشخص آخر!"); return; }
 
-      allowedStudents[trimmedNew] = sName;
+      allowedStudents[trimmedNew] = studentData;
       delete allowedStudents[trimmedOld];
 
       try {
