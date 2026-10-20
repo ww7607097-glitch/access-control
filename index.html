@@ -229,7 +229,7 @@
       margin-top: 10px;
     }
 
-    #studentsPage, #adminDashboardPage, #chatPage {
+    #studentsPage, #adminDashboardPage, #chatPage, #activityLogPage {
       display: none;
       text-align: right;
     }
@@ -346,7 +346,6 @@
       100% { transform: scale(0.95); opacity: 0.8; }
     }
 
-    /* تنسيق شاشة الدردشة الجماعية */
     .chat-box {
       background: var(--input-bg);
       border: 1px solid var(--border-color);
@@ -410,7 +409,7 @@
           <span>📊</span>
         </div>
         <div id="logsList">جاري تحميل السجلات...</div>
-        <button class="btn-danger" onclick="clearLogs()">مسح جميع السجلات 🗑️</button>
+        <button class="btn-danger" onclick="clearLogs()">مسح السجلات الرئيسية 🗑️</button>
       </div>
     </div>
 
@@ -426,6 +425,11 @@
         <div style="color: #38bdf8; font-weight: bold; margin-bottom: 4px;">☁️ JSONbin.io Cloud DB</div>
         <div id="adminRoleDisplay">إدارة صلبة ومتزامنة</div>
       </div>
+
+      <!-- زر سجل النشاط الدائم (غير القابل للحذف) -->
+      <button class="btn btn-primary" onclick="openActivityLogPage()" style="background: #f59e0b; margin-bottom: 10px;">
+        <span>📜 الأرشيف الدائم والدائم للنشاط (غير قابل للحذف)</span>
+      </button>
 
       <!-- زر الانتقال للدردشة الجماعية -->
       <button class="btn btn-primary" onclick="openChatRoom()" style="background: #10b981; margin-bottom: 15px;">
@@ -478,6 +482,11 @@
       </div>
       <p class="subtitle">اضغط على اسمك لعرض التوثيق</p>
 
+      <!-- زر الأرشيف الدائم للنشاط للطالب أيضاً -->
+      <button class="btn btn-primary" onclick="openActivityLogPage()" style="background: #f59e0b; margin-bottom: 10px; font-size: 13px; padding: 10px;">
+        <span>📜 الأرشيف الدائم للدخول (سجل دائم)</span>
+      </button>
+
       <!-- زر الانتقال للدردشة للطالب أيضاً -->
       <button class="btn btn-primary" onclick="openChatRoom()" style="background: #10b981; margin-bottom: 12px; font-size: 13px; padding: 10px;">
         <span>💬 دردشة الفريق الجماعية</span>
@@ -507,6 +516,25 @@
       <button class="btn btn-primary" onclick="sendChatMessage()" style="font-size: 13px; padding: 10px;">
         <span>إرسال الرسالة للسحابة</span> 📤
       </button>
+    </div>
+
+    <!-- 6. صفحة سجل الأرشيف الدائم (مخزن دائم لا ينحذف) -->
+    <div id="activityLogPage">
+      <div class="header-flex">
+        <h2>📜 الأرشيف الدائم للنشاط</h2>
+        <button class="theme-btn" onclick="backFromActivityLog()">رجوع ⬅️</button>
+      </div>
+      <p class="subtitle">سجل تراكمي دائم مخزن بالسحابة بدون إمكانية الحذف</p>
+
+      <div style="font-size: 11px; color: var(--text-sub); margin-bottom: 12px; text-align: right; background: rgba(245, 158, 11, 0.1); padding: 8px; border-radius: 8px; border: 1px solid rgba(245, 158, 11, 0.3);">
+        🔒 <b>ملاحظة أمان:</b> هذا السجل تراكمي ويتم توثيقه وتخزينه سحابياً بصفة دائمة، ولا يمتلك أي مستخدم صلاحية مسحه أو التعديل عليه.
+      </div>
+
+      <div class="peers-box" id="fullActivityLogsContainer" style="max-height: 320px;">
+        جاري جلب الأرشيف الكامل...
+      </div>
+
+      <button class="btn btn-primary" onclick="backFromActivityLog()">العودة ↩️</button>
     </div>
 
     <!-- 4. صفحة تفاصيل المشروع وربط السحابة -->
@@ -591,7 +619,7 @@
             formattedStudents[k] = typeof v === 'object' ? v : { name: v, role: "طالب فقط" };
           }
           allowedStudents = formattedStudents;
-          await updateCloudData(data.record.logs || [], allowedStudents, data.record.activeUsers || {}, data.record.chatMessages || []);
+          await updateCloudData(data.record.logs || [], allowedStudents, data.record.activeUsers || {}, data.record.chatMessages || [], data.record.permanentLogs || []);
         } else {
           let loaded = data.record.students;
           let formattedStudents = {};
@@ -623,12 +651,12 @@
       fetchLogs();
     }
 
-    async function updateCloudData(logs, students, activeUsers, chatMessages) {
+    async function updateCloudData(logs, students, activeUsers, chatMessages, permanentLogs) {
       try {
         await fetch(API_URL, {
           method: "PUT",
           headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
-          body: JSON.stringify({ logs, students, activeUsers, chatMessages })
+          body: JSON.stringify({ logs, students, activeUsers, chatMessages, permanentLogs })
         });
       } catch (e) {}
     }
@@ -697,8 +725,11 @@
         let studentsData = dataGet.record.students || allowedStudents;
         let activeUsers = dataGet.record.activeUsers || {};
         let chatMessages = dataGet.record.chatMessages || [];
+        let permanentLogs = dataGet.record.permanentLogs || [];
 
+        // التخزين في السجل العادي والأرشيف الدائم بنفس الوقت
         currentLogs.push(newLog);
+        permanentLogs.push(newLog);
 
         if (isRegistered) {
           activeUsers[cardCode] = {
@@ -709,7 +740,7 @@
           };
         }
 
-        await updateCloudData(currentLogs, studentsData, activeUsers, chatMessages);
+        await updateCloudData(currentLogs, studentsData, activeUsers, chatMessages, permanentLogs);
 
         input.value = "";
         fetchLogs();
@@ -733,6 +764,7 @@
       document.getElementById("studentsPage").style.display = "none";
       document.getElementById("projectInfoPage").style.display = "none";
       document.getElementById("chatPage").style.display = "none";
+      document.getElementById("activityLogPage").style.display = "none";
       document.getElementById("adminDashboardPage").style.display = "block";
       
       document.getElementById("adminTitleHeader").innerText = `🛡️ لوحة إدارة: ${adminName}`;
@@ -781,6 +813,64 @@
         html += `<div style="margin-bottom:3px;">👤 <b>${info.name}</b> (${info.role}) - <span style="color:var(--primary); font-weight:600;">${timeString}</span></div>`;
       }
       activeListContainer.innerHTML = html;
+    }
+
+    // عرض الأرشيف الدائم غير القابل للحذف
+    async function openActivityLogPage() {
+      document.getElementById("adminDashboardPage").style.display = "none";
+      document.getElementById("studentsPage").style.display = "none";
+      document.getElementById("activityLogPage").style.display = "block";
+
+      const container = document.getElementById("fullActivityLogsContainer");
+      container.innerHTML = "<div style='text-align:center; font-size:12px; color:var(--text-sub);'>جاري تحميل الأرشيف الدائم من السحابة...</div>";
+
+      try {
+        const res = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
+        const data = await res.json();
+        
+        // جلب الأرشيف الدائم، وإن لم يوجد يجلب سجلات اللوج العامة
+        let permLogs = data.record.permanentLogs;
+        if (!permLogs || permLogs.length === 0) {
+          permLogs = data.record.logs || [];
+        }
+
+        if (permLogs.length === 0) {
+          container.innerHTML = "<div style='text-align:center; font-size:12px; color:var(--text-sub);'>لا توجد سجلات مخزنة في الأرشيف الدائم حتى الآن.</div>";
+          return;
+        }
+
+        container.innerHTML = "";
+        permLogs.slice().reverse().forEach((log) => {
+          const isPermitted = log.status === "مسموح بالدخول";
+          const div = document.createElement("div");
+          div.className = `log-item ${isPermitted ? "permitted" : "denied"}`;
+          div.style.marginBottom = "8px";
+          div.innerHTML = `
+            <div style="font-weight:700; font-size:13px; display:flex; justify-content:space-between;">
+              <span>👤 ${log.name}</span>
+              <span style="color: ${isPermitted ? '#10b981' : '#ef4444'}; font-weight:bold; font-size:11px;">${log.status}</span>
+            </div>
+            <div style="font-size:11px; color:var(--text-sub); margin-top:3px;">
+              الكارت / الكود المستعمل: <b>${log.card}</b>
+            </div>
+            <div class="log-time" style="font-size:11px; margin-top:4px; font-weight:600; color:var(--primary);">
+              🕒 تاريخ ووقت الدخول: ${log.timestamp}
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      } catch (err) {
+        container.innerHTML = "<div style='color:red; font-size:12px; text-align:center;'>خطأ بالاتصال وجلب سجلات الأرشيف الدائم.</div>";
+      }
+    }
+
+    function backFromActivityLog() {
+      document.getElementById("activityLogPage").style.display = "none";
+      if (currentLoggedInRole === "مشرف" || currentLoggedInRole === "المالك") {
+        document.getElementById("adminDashboardPage").style.display = "block";
+      } else {
+        document.getElementById("studentsPage").style.display = "block";
+      }
     }
 
     function renderAdminManageList(currentAdminCode, currentAdminRole) {
@@ -856,7 +946,7 @@
       try {
         const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
         const dataGet = await resGet.json();
-        await updateCloudData(dataGet.record.logs || [], allowedStudents, dataGet.record.activeUsers || {}, dataGet.record.chatMessages || []);
+        await updateCloudData(dataGet.record.logs || [], allowedStudents, dataGet.record.activeUsers || {}, dataGet.record.chatMessages || [], dataGet.record.permanentLogs || []);
         alert("تم تحديث الاسم بنجاح في السحابة!");
         showAdminDashboard(allowedStudents[currentLoggedInCode].name, currentLoggedInCode, currentLoggedInRole, dataGet.record.activeUsers);
       } catch (err) {
@@ -885,7 +975,7 @@
       try {
         const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
         const dataGet = await resGet.json();
-        await updateCloudData(dataGet.record.logs || [], allowedStudents, dataGet.record.activeUsers || {}, dataGet.record.chatMessages || []);
+        await updateCloudData(dataGet.record.logs || [], allowedStudents, dataGet.record.activeUsers || {}, dataGet.record.chatMessages || [], dataGet.record.permanentLogs || []);
 
         alert(`تم إضافة الطالب (${name}) بنجاح للسحابة!`);
         nameInput.value = "";
@@ -915,7 +1005,7 @@
       try {
         const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
         const dataGet = await resGet.json();
-        await updateCloudData(dataGet.record.logs || [], allowedStudents, dataGet.record.activeUsers || {}, dataGet.record.chatMessages || []);
+        await updateCloudData(dataGet.record.logs || [], allowedStudents, dataGet.record.activeUsers || {}, dataGet.record.chatMessages || [], dataGet.record.permanentLogs || []);
         alert("تم تحديث الدور بنجاح في السحابة!");
         showAdminDashboard(allowedStudents[currentLoggedInCode].name, currentLoggedInCode, currentLoggedInRole, dataGet.record.activeUsers);
       } catch (err) {
@@ -939,7 +1029,7 @@
       try {
         const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
         const dataGet = await resGet.json();
-        await updateCloudData(dataGet.record.logs || [], allowedStudents, dataGet.record.activeUsers || {}, dataGet.record.chatMessages || []);
+        await updateCloudData(dataGet.record.logs || [], allowedStudents, dataGet.record.activeUsers || {}, dataGet.record.chatMessages || [], dataGet.record.permanentLogs || []);
         showAdminDashboard(allowedStudents[currentLoggedInCode].name, currentLoggedInCode, currentLoggedInRole, dataGet.record.activeUsers);
       } catch (err) {
         alert("فشل الحذف من السحابة!");
@@ -951,6 +1041,7 @@
       document.getElementById("adminDashboardPage").style.display = "none";
       document.getElementById("projectInfoPage").style.display = "none";
       document.getElementById("chatPage").style.display = "none";
+      document.getElementById("activityLogPage").style.display = "none";
       document.getElementById("studentsPage").style.display = "block";
       document.getElementById("welcomeMsg").innerText = `مرحباً بك: ${studentName}`;
       
@@ -979,13 +1070,11 @@
       });
     }
 
-    // دوال الدردشة الجماعية السحابية
     function openChatRoom() {
       document.getElementById("adminDashboardPage").style.display = "none";
       document.getElementById("studentsPage").style.display = "none";
       document.getElementById("chatPage").style.display = "block";
       fetchChatMessages();
-      // تحديث الرسائل تلقائياً كل 4 ثوانٍ
       chatRefreshInterval = setInterval(fetchChatMessages, 4000);
     }
 
@@ -1050,10 +1139,11 @@
         let students = dataGet.record.students || allowedStudents;
         let activeUsers = dataGet.record.activeUsers || {};
         let chatMessages = dataGet.record.chatMessages || [];
+        let permanentLogs = dataGet.record.permanentLogs || [];
 
         chatMessages.push(newMsg);
 
-        await updateCloudData(logs, students, activeUsers, chatMessages);
+        await updateCloudData(logs, students, activeUsers, chatMessages, permanentLogs);
         input.value = "";
         fetchChatMessages();
       } catch (err) {
@@ -1084,6 +1174,7 @@
       document.getElementById("adminDashboardPage").style.display = "none";
       document.getElementById("projectInfoPage").style.display = "none";
       document.getElementById("chatPage").style.display = "none";
+      document.getElementById("activityLogPage").style.display = "none";
       document.getElementById("mainPage").style.display = "block";
       fetchLogs();
     }
@@ -1108,7 +1199,7 @@
       try {
         const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
         const dataGet = await resGet.json();
-        await updateCloudData(dataGet.record.logs || [], allowedStudents, dataGet.record.activeUsers || {}, dataGet.record.chatMessages || []);
+        await updateCloudData(dataGet.record.logs || [], allowedStudents, dataGet.record.activeUsers || {}, dataGet.record.chatMessages || [], dataGet.record.permanentLogs || []);
         alert(`تم تحديث الكود بنجاح يا ${sName}!`);
         fetchLogs();
       } catch (err) {
@@ -1116,12 +1207,13 @@
       }
     }
 
+    // زر مسح السجلات الشاشة الرئيسية يمسح السجلات السريعة فقط بدون لمس الأرشيف الدائم
     async function clearLogs() {
-      if (!confirm("هل تريد مسح السجلات؟")) return;
+      if (!confirm("هل تريد مسح الشاشة الرئيسية للسجلات؟ (سيبقى الأرشيف السحابي الدائم كاملاً)")) return;
       try {
         const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
         const dataGet = await resGet.json();
-        await updateCloudData([], dataGet.record.students || allowedStudents, dataGet.record.activeUsers || {}, dataGet.record.chatMessages || []);
+        await updateCloudData([], dataGet.record.students || allowedStudents, dataGet.record.activeUsers || {}, dataGet.record.chatMessages || [], dataGet.record.permanentLogs || []);
         fetchLogs();
       } catch (err) {
         alert("فشل مسح السجلات!");
