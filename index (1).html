@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام التحكم بالوصول السحابي الآمن</title>
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --text-main: #1f2937;
+      --text-sub: #6b7280;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --input-bg: #f9fafb;
+      --logs-bg: #f8fafc;
+      --log-item-bg: #ffffff;
+      --border-color: #e5e7eb;
+    }
+
+    body.theme-green {
+      --bg-gradient: linear-gradient(135deg, #064e3b 0%, #022c22 100%);
+      --card-bg: rgba(20, 35, 30, 0.95);
+      --text-main: #f3f4f6;
+      --text-sub: #9ca3af;
+      --primary: #059669;
+      --primary-hover: #047857;
+      --input-bg: #065f46;
+      --logs-bg: #022c22;
+      --log-item-bg: #064e3b;
+      --border-color: #047857;
+    }
+
+    body.theme-light {
+      --bg-gradient: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-sub: #475569;
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --input-bg: #f8fafc;
+      --logs-bg: #f1f5f9;
+      --log-item-bg: #ffffff;
+      --border-color: #cbd5e1;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-gradient);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 15px;
+      box-sizing: border-box;
+      transition: background 0.4s ease;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      padding: 30px 20px;
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.4s ease;
+    }
+
+    .header-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      margin: 0;
+      color: var(--text-main);
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .theme-btn {
+      background: none;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+
+    .theme-btn:hover {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    p.subtitle {
+      color: var(--text-sub);
+      font-size: 13px;
+      margin-bottom: 25px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 15px;
+    }
+
+    input[type="password"] {
+      width: 100%;
+      padding: 14px 15px;
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      box-sizing: border-box;
+      font-size: 16px;
+      text-align: center;
+      outline: none;
+      transition: all 0.3s ease;
+      background: var(--input-bg);
+      color: var(--text-main);
+    }
+
+    input[type="password"]:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      margin-bottom: 10px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--input-bg);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      opacity: 0.8;
+    }
+
+    .logs-container {
+      margin-top: 25px;
+      background-color: var(--logs-bg);
+      padding: 15px;
+      border-radius: 14px;
+      text-align: right;
+      border: 1px solid var(--border-color);
+    }
+
+    .logs-title {
+      font-weight: 700;
+      margin-bottom: 12px;
+      font-size: 14px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .log-item {
+      background: var(--log-item-bg);
+      color: var(--text-main);
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      border-right: 4px solid #cbd5e1;
+      font-size: 13px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .log-item.permitted {
+      border-right-color: #10b981;
+    }
+
+    .log-item.denied {
+      border-right-color: #ef4444;
+    }
+
+    .log-time {
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-top: 5px;
+    }
+
+    .btn-danger {
+      width: 100%;
+      background-color: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 12px;
+      transition: background 0.2s;
+    }
+
+    .btn-danger:hover {
+      background-color: rgba(239, 68, 68, 0.2);
+    }
+
+    #studentsPage {
+      display: none;
+      text-align: right;
+    }
+
+    .student-row {
+      background: var(--log-item-bg);
+      color: var(--text-main);
+      padding: 12px 15px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      border: 1px solid var(--border-color);
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    
+    <!-- الواجهة الأولى: فحص الكارت -->
+    <div id="mainPage">
+      <div class="header-flex">
+        <h2>نظام التحكم الأمني</h2>
+        <button class="theme-btn" onclick="toggleTheme()">🎨 تغيير الثيم</button>
+      </div>
+      <p class="subtitle">Secure Cloud Access System</p>
+
+      <div class="input-group">
+        <input type="password" id="cardInput" placeholder="أدخل رقم الكارت السري">
+      </div>
+      
+      <button class="btn btn-primary" onclick="checkCard()">
+        <span>فحص الكارت وتسجيل الدخول</span> 🔒
+      </button>
+      <button class="btn btn-secondary" onclick="changeCardCode()">
+        <span>تغيير الكود الخاص</span> 🔄
+      </button>
+
+      <div class="logs-container">
+        <div class="logs-title">
+          <span>السجلات السحابية الآمنة</span>
+          <span>🔒</span>
+        </div>
+        <div id="logsList">جاري تحميل السجلات...</div>
+        
+        <button class="btn-danger" onclick="clearLogs()">مسح جميع السجلات 🗑️</button>
+      </div>
+    </div>
+
+    <!-- الواجهة الثانية: لوحة الطالب بعد تسجيل الدخول -->
+    <div id="studentsPage">
+      <h2>لوحة المجموعة</h2>
+      <p class="subtitle" id="welcomeMsg" style="color: var(--primary); font-weight: 600;"></p>
+
+      <div style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px; font-weight: bold;">الزملاء المصرح لهم بالدخول:</div>
+      <div id="studentsListContainer" style="max-height: 280px; overflow-y: auto; margin-bottom: 15px;">
+        <!-- يتم تعبئة أسماء الطلاب برمجياً بدون كشف كارتاتهم -->
+      </div>
+
+      <button class="btn btn-primary" onclick="goBackToMain()">تسجيل الخروج والرجوع ⬅️</button>
+    </div>
+
+  </div>
+
+  <script>
+    const BIN_ID = "6ad63709ffd5d1605379280a";
+    const API_KEY = "$2a$10$B/lrLx7OzVkD1fNOy6qb.OLupBAhUi43qUZ.xITLWykvf1wvdB4Nu";
+    const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
+    const defaultStudents = {
+      "C006": "محمد خضر",
+      "C007": "عبدالله خضر",
+      "C008": "حسين علي عتيب",
+      "C009": "حسين عبدالكريم",
+      "C010": "احمد عبدالرحمان"
+    };
+
+    let allowedStudents = {};
+
+    function toggleTheme() {
+      const body = document.body;
+      if (!body.classList.contains('theme-green') && !body.classList.contains('theme-light')) {
+        body.classList.add('theme-green');
+        localStorage.setItem('app_theme', 'green');
+      } else if (body.classList.contains('theme-green')) {
+        body.classList.remove('theme-green');
+        body.classList.add('theme-light');
+        localStorage.setItem('app_theme', 'light');
+      } else {
+        body.classList.remove('theme-light');
+        localStorage.setItem('app_theme', 'dark');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('app_theme');
+      if (savedTheme === 'green') {
+        document.body.classList.add('theme-green');
+      } else if (savedTheme === 'light') {
+        document.body.classList.add('theme-light');
+      }
+    });
+
+    async function initData() {
+      try {
+        const res = await fetch(API_URL, {
+          headers: { "X-Master-Key": API_KEY }
+        });
+        const data = await res.json();
+        
+        if (!data.record.students) {
+          allowedStudents = defaultStudents;
+          await fetch(API_URL, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Master-Key": API_KEY
+            },
+            body: JSON.stringify({ logs: data.record.logs || [], students: allowedStudents })
+          });
+        } else {
+          allowedStudents = data.record.students;
+        }
+      } catch (err) {
+        console.error("خطأ في تهيئة البيانات:", err);
+        allowedStudents = defaultStudents;
+      }
+      fetchLogs();
+    }
+
+    function maskCard(card) {
+      if (!card || card.length <= 2) return "***";
+      return card.substring(0, 2) + "***";
+    }
+
+    async function fetchLogs() {
+      const logsList = document.getElementById("logsList");
+      try {
+        const res = await fetch(API_URL, {
+          headers: { "X-Master-Key": API_KEY }
+        });
+        const data = await res.json();
+        const logs = data.record.logs || [];
+
+        if (logs.length === 0) {
+          logsList.innerHTML = "<p style='text-align:center; color:var(--text-sub); font-size:12px;'>لا توجد سجلات حالياً</p>";
+          return;
+        }
+
+        logsList.innerHTML = "";
+        logs.slice(-10).reverse().forEach(log => {
+          const div = document.createElement("div");
+          const isPermitted = log.status === "مسموح بالدخول";
+          div.className = `log-item ${isPermitted ? "permitted" : "denied"}`;
+          
+          const maskedCard = maskCard(log.card);
+
+          div.innerHTML = `
+            <div style="font-weight:600;">${log.name}</div>
+            <div style="display:flex; justify-content:space-between; margin-top:4px;">
+              <span>الكارت: ${maskedCard}</span>
+              <span style="color: ${isPermitted ? '#10b981' : '#ef4444'}; font-weight:bold;">${log.status} ${isPermitted ? '✅' : '❌'}</span>
+            </div>
+            <div class="log-time">${log.timestamp}</div>
+          `;
+          logsList.appendChild(div);
+        });
+      } catch (err) {
+        console.error("خطأ في التحميل:", err);
+        logsList.innerHTML = "<p style='color:red; font-size:12px;'>خطأ في تحميل السجلات</p>";
+      }
+    }
+
+    async function checkCard() {
+      const input = document.getElementById("cardInput");
+      const cardCode = input.value.trim().toUpperCase();
+
+      if (!cardCode) {
+        alert("يرجى إدخال رقم الكارت!");
+        return;
+      }
+
+      const name = allowedStudents[cardCode];
+      const isPermitted = Boolean(name);
+      const status = isPermitted ? "مسموح بالدخول" : "مرفوض";
+      const timestamp = new Date().toLocaleString("ar-IQ");
+
+      const newLog = { card: cardCode, name: (name || "محاولة دخول غير مصرح بها"), status: status, timestamp: timestamp };
+
+      try {
+        const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
+        const dataGet = await resGet.json();
+        let currentLogs = dataGet.record.logs || [];
+        let studentsData = dataGet.record.students || allowedStudents;
+
+        currentLogs.push(newLog);
+
+        await fetch(API_URL, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Master-Key": API_KEY
+          },
+          body: JSON.stringify({ logs: currentLogs, students: studentsData })
+        });
+
+        input.value = "";
+        fetchLogs();
+
+        if (isPermitted) {
+          showStudentsPage(name);
+        } else {
+          alert("الكارت غير مسجل! تم رفض الدخول ❌");
+        }
+      } catch (err) {
+        console.error("خطأ أثناء الحفظ:", err);
+        alert("حدث خطأ أثناء الاتصال بالسحابة!");
+      }
+    }
+
+    function showStudentsPage(studentName) {
+      document.getElementById("mainPage").style.display = "none";
+      document.getElementById("studentsPage").style.display = "block";
+      document.getElementById("welcomeMsg").innerText = `أهلاً بك يا ${studentName}`;
+
+      const container = document.getElementById("studentsListContainer");
+      container.innerHTML = "";
+
+      for (let code in allowedStudents) {
+        const div = document.createElement("div");
+        div.className = "student-row";
+        div.innerHTML = `
+          <span>👤 <strong>${allowedStudents[code]}</strong></span>
+          <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600;">مصرح له ✅</span>
+        `;
+        container.appendChild(div);
+      }
+    }
+
+    function goBackToMain() {
+      document.getElementById("studentsPage").style.display = "none";
+      document.getElementById("mainPage").style.display = "block";
+    }
+
+    async function changeCardCode() {
+      const oldCode = prompt("أدخل كارتك الحالي (القديم):");
+      if (!oldCode) return;
+
+      const trimmedOld = oldCode.trim().toUpperCase();
+
+      if (!allowedStudents[trimmedOld]) {
+        alert("الكارت القديم غير موجود في النظام!");
+        return;
+      }
+
+      const studentName = allowedStudents[trimmedOld];
+      const newCode = prompt(`أهلاً بك (${studentName}). أدخل الكود الجديد المخصص لك:`);
+      
+      if (!newCode) return;
+
+      const trimmedNew = newCode.trim().toUpperCase();
+
+      if (allowedStudents[trimmedNew]) {
+        alert("هذا الكود الجديد مستخدم بالفعل لشخص آخر!");
+        return;
+      }
+
+      allowedStudents[trimmedNew] = studentName;
+      delete allowedStudents[trimmedOld];
+
+      try {
+        const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
+        const dataGet = await resGet.json();
+        let currentLogs = dataGet.record.logs || [];
+
+        await fetch(API_URL, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Master-Key": API_KEY
+          },
+          body: JSON.stringify({ logs: currentLogs, students: allowedStudents })
+        });
+
+        alert(`تم تغيير الكود بنجاح يا ${studentName}!\nكودك الجديد هو: ${trimmedNew}`);
+        fetchLogs();
+      } catch (err) {
+        console.error("خطأ في تحديث الكود:", err);
+        alert("حدث خطأ أثناء حفظ الكود الجديد في السحابة!");
+      }
+    }
+
+    async function clearLogs() {
+      if (!confirm("هل أنت متأكد من مسح جميع السجلات نهائياً؟")) return;
+
+      try {
+        const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
+        const dataGet = await resGet.json();
+        let studentsData = dataGet.record.students || allowedStudents;
+
+        const res = await fetch(API_URL, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Master-Key": API_KEY
+          },
+          body: JSON.stringify({ logs: [], students: studentsData })
+        });
+
+        if (res.ok) {
+          alert("تم مسح السجلات بنجاح!");
+          fetchLogs();
+        } else {
+          alert("فشل مسح السجلات!");
+        }
+      } catch (err) {
+        console.error("خطأ في المسح:", err);
+        alert("حدث خطأ أثناء مسح السجلات!");
+      }
+    }
+
+    initData();
+  </script>
+</body>
+</html>
