@@ -229,7 +229,7 @@
       margin-top: 10px;
     }
 
-    #studentsPage, #adminDashboardPage {
+    #studentsPage, #adminDashboardPage, #chatPage {
       display: none;
       text-align: right;
     }
@@ -308,7 +308,6 @@
       border: 1px solid #334155;
     }
 
-    /* تنسيق بطاقات قائمة الطلاب داخل لوحة الإدارة لمنع التداخل وترتيبها بشكل ممتاز */
     .admin-student-row {
       display: flex;
       justify-content: space-between;
@@ -321,13 +320,72 @@
       font-size: 12px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
+
+    .active-now-box {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 15px;
+      font-size: 12px;
+      color: var(--text-main);
+      text-align: right;
+    }
+    .active-dot {
+      height: 8px;
+      width: 8px;
+      background-color: #10b981;
+      border-radius: 50%;
+      display: inline-block;
+      margin-left: 5px;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+
+    /* تنسيق شاشة الدردشة الجماعية */
+    .chat-box {
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      height: 250px;
+      overflow-y: auto;
+      padding: 10px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .chat-msg {
+      background: var(--log-item-bg);
+      border: 1px solid var(--border-color);
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      text-align: right;
+    }
+    .chat-sender {
+      font-weight: bold;
+      color: var(--primary);
+      font-size: 11px;
+      margin-bottom: 2px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .chat-time {
+      font-size: 9px;
+      color: var(--text-sub);
+    }
   </style>
 </head>
 <body>
 
   <div class="card">
     
-    <!-- 1. الشاشة الرئيسية: تسجيل الدخول والسجلات -->
+    <!-- 1. الشاشة الرئيسية -->
     <div id="mainPage">
       <div class="header-flex">
         <h2>نظام التحكم الأمني</h2>
@@ -336,7 +394,7 @@
       <p class="subtitle">Cloud Access Control System</p>
 
       <div class="input-group">
-        <input type="password" id="cardInput" placeholder="أدخل كارتك أو كود المشرف">
+        <input type="password" id="cardInput" placeholder="أدخل كارتك أو كود الإدارة">
       </div>
       
       <button class="btn btn-primary" onclick="checkCard()">
@@ -369,7 +427,20 @@
         <div id="adminRoleDisplay">إدارة صلبة ومتزامنة</div>
       </div>
 
-      <!-- قسم إضافة طالب جديد (بطاقة مستقلة ومنظمة) -->
+      <!-- زر الانتقال للدردشة الجماعية -->
+      <button class="btn btn-primary" onclick="openChatRoom()" style="background: #10b981; margin-bottom: 15px;">
+        <span>💬 فتح غرفة دردشة الفريق السحابية</span>
+      </button>
+
+      <!-- قسم حالة النشاط الذكي -->
+      <div class="active-now-box">
+        <div style="font-weight: 700; margin-bottom: 4px; display: flex; align-items: center;">
+          <span class="active-dot"></span> حالة النشاط داخل النظام:
+        </div>
+        <div id="activeUsersList" style="color: var(--text-sub); font-size: 11px;">جاري جلب النشاط...</div>
+      </div>
+
+      <!-- قسم إضافة طالب جديد -->
       <div class="info-section" style="text-align: right;">
         <h4>➕ إضافة طالب جديد</h4>
         <div class="input-group" style="margin-bottom: 8px;">
@@ -383,10 +454,10 @@
         </button>
       </div>
 
-      <!-- قسم إدارة الأدوار (بطاقة مستقلة ومنظمة بمساحة مريحة) -->
+      <!-- قسم إدارة الأدوار والأسماء -->
       <div class="info-section" style="text-align: right;" id="rolesManagementSection">
-        <h4 id="rolesSectionTitle">👑 إدارة أدوار وحسابات الطلاب</h4>
-        <p style="font-size: 11px; color: var(--text-sub); margin-bottom: 10px;">تغيير أدوار الفريق:</p>
+        <h4 id="rolesSectionTitle">👑 إدارة أدوار وأسماء الطلاب</h4>
+        <p style="font-size: 11px; color: var(--text-sub); margin-bottom: 10px;" id="rolesSubText">القائمة:</p>
         <div id="adminManageList" style="max-height: 180px; overflow-y: auto; padding-left: 4px;">
           جاري التحميل...
         </div>
@@ -407,10 +478,35 @@
       </div>
       <p class="subtitle">اضغط على اسمك لعرض التوثيق</p>
 
+      <!-- زر الانتقال للدردشة للطالب أيضاً -->
+      <button class="btn btn-primary" onclick="openChatRoom()" style="background: #10b981; margin-bottom: 12px; font-size: 13px; padding: 10px;">
+        <span>💬 دردشة الفريق الجماعية</span>
+      </button>
+
       <div style="font-size: 12px; font-weight:700; margin-bottom:8px; color:var(--text-sub); text-align:right;">قائمة أعضاء الفريق (اضغط على اسمك لعرض التوثيق):</div>
       <div class="peers-box" id="peersListContainer">
         جاري التحميل...
       </div>
+    </div>
+
+    <!-- 5. صفحة الدردشة الجماعية الجديدة -->
+    <div id="chatPage">
+      <div class="header-flex">
+        <h2>💬 دردشة الفريق الجماعية</h2>
+        <button class="theme-btn" onclick="backFromChat()">رجوع ⬅️</button>
+      </div>
+      <p class="subtitle">مراسلة سحابية فورية بين أعضاء الفريق</p>
+
+      <div class="chat-box" id="chatMessagesContainer">
+        جاري تحميل الرسائل...
+      </div>
+
+      <div class="input-group" style="margin-bottom: 8px;">
+        <input type="text" id="chatInputMessage" placeholder="اكتب رسالتك هنا..." onkeypress="handleChatKeyPress(event)">
+      </div>
+      <button class="btn btn-primary" onclick="sendChatMessage()" style="font-size: 13px; padding: 10px;">
+        <span>إرسال الرسالة للسحابة</span> 📤
+      </button>
     </div>
 
     <!-- 4. صفحة تفاصيل المشروع وربط السحابة -->
@@ -458,7 +554,11 @@
     };
 
     let allowedStudents = {};
-    const MASTER_OWNER_CODE = "00000";
+    const MASTER_DEVELOPER_CODE = "00000";
+    let currentLoggedInCode = "";
+    let currentLoggedInRole = "";
+    let currentLoggedInName = "";
+    let chatRefreshInterval = null;
 
     function toggleTheme() {
       const body = document.body;
@@ -491,11 +591,7 @@
             formattedStudents[k] = typeof v === 'object' ? v : { name: v, role: "طالب فقط" };
           }
           allowedStudents = formattedStudents;
-          await fetch(API_URL, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
-            body: JSON.stringify({ logs: data.record.logs || [], students: allowedStudents })
-          });
+          await updateCloudData(data.record.logs || [], allowedStudents, data.record.activeUsers || {}, data.record.chatMessages || []);
         } else {
           let loaded = data.record.students;
           let formattedStudents = {};
@@ -508,10 +604,10 @@
               formattedStudents[k] = { name: v.name, role: cleanedRole || "طالب فقط" };
             }
           }
-          if (!formattedStudents[MASTER_OWNER_CODE]) {
-            formattedStudents[MASTER_OWNER_CODE] = { name: "محمد خضر", role: "المالك" };
+          if (!formattedStudents[MASTER_DEVELOPER_CODE]) {
+            formattedStudents[MASTER_DEVELOPER_CODE] = { name: "محمد خضر", role: "المالك" };
           } else {
-            formattedStudents[MASTER_OWNER_CODE].role = "المالك";
+            formattedStudents[MASTER_DEVELOPER_CODE].role = "المالك";
           }
           allowedStudents = formattedStudents;
         }
@@ -525,6 +621,16 @@
         };
       }
       fetchLogs();
+    }
+
+    async function updateCloudData(logs, students, activeUsers, chatMessages) {
+      try {
+        await fetch(API_URL, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
+          body: JSON.stringify({ logs, students, activeUsers, chatMessages })
+        });
+      } catch (e) {}
     }
 
     function maskCard(card) {
@@ -566,12 +672,16 @@
     async function checkCard() {
       const input = document.getElementById("cardInput");
       const cardCode = input.value.trim().toUpperCase();
-      if (!cardCode) { alert("أدخل رقم الكارت!"); return; }
+      if (!cardCode) { alert("أدخل رقم الكارت أو الكود!"); return; }
 
       const studentObj = allowedStudents[cardCode];
       const isRegistered = Boolean(studentObj);
       const studentName = isRegistered ? studentObj.name : "محاولة دخول غير مرخص";
       const studentRole = isRegistered ? (studentObj.role || "طالب فقط") : "";
+
+      currentLoggedInCode = cardCode;
+      currentLoggedInRole = studentRole;
+      currentLoggedInName = studentName;
 
       const newLog = { 
         card: cardCode, 
@@ -585,56 +695,101 @@
         const dataGet = await resGet.json();
         let currentLogs = dataGet.record.logs || [];
         let studentsData = dataGet.record.students || allowedStudents;
+        let activeUsers = dataGet.record.activeUsers || {};
+        let chatMessages = dataGet.record.chatMessages || [];
+
         currentLogs.push(newLog);
 
-        await fetch(API_URL, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
-          body: JSON.stringify({ logs: currentLogs, students: studentsData })
-        });
+        if (isRegistered) {
+          activeUsers[cardCode] = {
+            name: studentName,
+            role: studentRole,
+            lastActiveTime: Date.now(),
+            isOnline: true
+          };
+        }
+
+        await updateCloudData(currentLogs, studentsData, activeUsers, chatMessages);
 
         input.value = "";
         fetchLogs();
 
         if (isRegistered) {
           if (studentRole === "مشرف" || studentRole === "المالك") {
-            showAdminDashboard(studentName, cardCode, studentRole);
+            showAdminDashboard(studentName, cardCode, studentRole, activeUsers);
           } else {
             showStudentsPage(studentName);
           }
         } else {
-          alert("الكارت غير مسجل! تم رفض الدخول ❌");
+          alert("الكود غير مسجل! تم رفض الدخول ❌");
         }
       } catch (err) {
         alert("خطأ بالاتصال بالسحابة!");
       }
     }
 
-    function showAdminDashboard(adminName, adminCode, adminRole) {
+    async function showAdminDashboard(adminName, adminCode, adminRole, activeUsers) {
       document.getElementById("mainPage").style.display = "none";
       document.getElementById("studentsPage").style.display = "none";
       document.getElementById("projectInfoPage").style.display = "none";
+      document.getElementById("chatPage").style.display = "none";
       document.getElementById("adminDashboardPage").style.display = "block";
       
       document.getElementById("adminTitleHeader").innerText = `🛡️ لوحة إدارة: ${adminName}`;
       document.getElementById("adminSubtitle").innerText = `الدور الحالي: ${adminRole}`;
       document.getElementById("adminRoleDisplay").innerText = `الدور: ${adminRole} | الاسم: ${adminName}`;
 
-      const rolesTitle = document.getElementById("rolesSectionTitle");
+      renderActiveUsers(activeUsers);
 
-      if (adminRole === "مشرف") {
-        rolesTitle.innerText = "📋 قائمة طلاب الفريق (إضافة طلاب جدد فقط)";
+      const rolesTitle = document.getElementById("rolesSectionTitle");
+      const rolesSubText = document.getElementById("rolesSubText");
+
+      if (adminCode === MASTER_DEVELOPER_CODE) {
+        rolesTitle.innerText = "👑 لوحة المؤسس (صلاحيات كاملة للمطور)";
+        rolesSubText.innerText = "تعديل الأسماء، تغيير الأدوار، حذف الطلاب (مؤسس التطبيق):";
+      } else if (adminRole === "المالك") {
+        rolesTitle.innerText = "👑 إدارة أدوار الفريق (المالك)";
+        rolesSubText.innerText = "إضافة طلاب وتحويل الأدوار فقط (بدون تعديل أسماء أو حذف):";
       } else {
-        rolesTitle.innerText = "👑 إدارة أدوار وحسابات الطلاب";
+        rolesTitle.innerText = "📋 قائمة طلاب الفريق (المشرف)";
+        rolesSubText.innerText = "إضافة طلاب جدد فقط:";
       }
 
       renderAdminManageList(adminCode, adminRole);
+    }
+
+    function formatTimeAgo(timestamp) {
+      const diffSec = Math.floor((Date.now() - timestamp) / 1000);
+      if (diffSec < 15) return "نشط حالياً 🟢";
+      if (diffSec < 60) return `كان نشطاً منذ ${diffSec} ثانية`;
+      const diffMin = Math.floor(diffSec / 60);
+      if (diffMin === 1) return "كان نشطاً منذ دقيقة واحدة";
+      if (diffMin === 2) return "كان نشطاً منذ دقيقتين";
+      if (diffMin <= 10) return `كان نشطاً منذ ${diffMin} دقائق`;
+      return `كان نشطاً منذ ${diffMin} دقيقة`;
+    }
+
+    function renderActiveUsers(activeUsers) {
+      const activeListContainer = document.getElementById("activeUsersList");
+      if (!activeUsers || Object.keys(activeUsers).length === 0) {
+        activeListContainer.innerHTML = "لا يوجد مستخدمين مسجلين في سجل النشاط.";
+        return;
+      }
+      let html = "";
+      for (let [code, info] of Object.entries(activeUsers)) {
+        const timeString = formatTimeAgo(info.lastActiveTime);
+        html += `<div style="margin-bottom:3px;">👤 <b>${info.name}</b> (${info.role}) - <span style="color:var(--primary); font-weight:600;">${timeString}</span></div>`;
+      }
+      activeListContainer.innerHTML = html;
     }
 
     function renderAdminManageList(currentAdminCode, currentAdminRole) {
       const listContainer = document.getElementById("adminManageList");
       listContainer.innerHTML = "";
       
+      const isDeveloper = (currentAdminCode === MASTER_DEVELOPER_CODE);
+      const isOwner = (currentAdminRole === "المالك");
+
       for (const [code, val] of Object.entries(allowedStudents)) {
         const name = typeof val === 'object' ? val.name : val;
         let role = typeof val === 'object' ? (val.role || "طالب فقط") : "طالب فقط";
@@ -645,24 +800,34 @@
         
         let actionControls = '';
 
-        if (code === MASTER_OWNER_CODE) {
-          actionControls = `<span style="color:#10b981; font-weight:bold; font-size:11px;">محمي (المالك الأساسي)</span>`;
-        } 
-        else if (currentAdminRole === "مشرف" && (role === "مشرف" || role === "المالك")) {
-          actionControls = `<span style="color:#4f46e5; font-weight:bold; font-size:11px;">${role} (محمي)</span>`;
-        } 
-        else if (currentAdminRole === "المالك") {
+        if (isDeveloper) {
           actionControls = `
-            <div style="display:flex; gap:5px; align-items:center;">
-              <select onchange="updateStudentRole('${code}', this.value)" style="font-size:11px; padding:4px 6px; border-radius:6px; border:1px solid var(--border-color); background:var(--input-bg); color:var(--text-main);">
+            <div style="display:flex; gap:4px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+              <button onclick="editStudentName('${code}')" style="background:#0284c7; color:white; border:none; padding:4px 6px; border-radius:6px; cursor:pointer; font-size:11px;">تعديل الاسم ✏️</button>
+              <select onchange="updateStudentRole('${code}', this.value)" style="font-size:11px; padding:3px; border-radius:6px; border:1px solid var(--border-color); background:var(--input-bg); color:var(--text-main);">
                 <option value="المالك" ${role === 'المالك' ? 'selected' : ''}>المالك</option>
                 <option value="مشرف" ${role === 'مشرف' ? 'selected' : ''}>مشرف</option>
                 <option value="طالب فقط" ${role === 'طالب فقط' ? 'selected' : ''}>طالب فقط</option>
               </select>
-              <button onclick="adminDeleteStudent('${code}', '${currentAdminCode}', '${currentAdminRole}')" style="background:#ef4444; color:white; border:none; padding:5px 8px; border-radius:6px; cursor:pointer; font-size:11px;">حذف</button>
+              ${code !== MASTER_DEVELOPER_CODE ? `<button onclick="adminDeleteStudent('${code}')" style="background:#ef4444; color:white; border:none; padding:4px 6px; border-radius:6px; cursor:pointer; font-size:11px;">حذف</button>` : `<span style="color:#10b981; font-size:10px; font-weight:bold;">(محمي كمؤسس)</span>`}
             </div>
           `;
-        } else {
+        } 
+        else if (isOwner) {
+          actionControls = `
+            <div style="display:flex; gap:4px; align-items:center;">
+              ${code === MASTER_DEVELOPER_CODE ? 
+                `<span style="color:#10b981; font-weight:bold; font-size:11px;">المؤسس (محمي)</span>` : 
+                `<select onchange="updateStudentRole('${code}', this.value)" style="font-size:11px; padding:4px; border-radius:6px; border:1px solid var(--border-color); background:var(--input-bg); color:var(--text-main);">
+                  <option value="المالك" ${role === 'المالك' ? 'selected' : ''}>المالك</option>
+                  <option value="مشرف" ${role === 'مشرف' ? 'selected' : ''}>مشرف</option>
+                  <option value="طالب فقط" ${role === 'طالب فقط' ? 'selected' : ''}>طالب فقط</option>
+                </select>`
+              }
+            </div>
+          `;
+        } 
+        else {
           actionControls = `<span style="color:var(--text-sub); font-size:11px;">عرض فقط</span>`;
         }
 
@@ -674,6 +839,28 @@
           <div>${actionControls}</div>
         `;
         listContainer.appendChild(row);
+      }
+    }
+
+    async function editStudentName(code) {
+      if (currentLoggedInCode !== MASTER_DEVELOPER_CODE) {
+        alert("عذراً، تعديل الأسماء متاح حصراً لمؤسس ومبرمج التطبيق الرئيسي!");
+        return;
+      }
+      const currentName = allowedStudents[code].name;
+      const newName = prompt(`أدخل الاسم الجديد لـ (${currentName}):`, currentName);
+      if (!newName || !newName.trim()) return;
+      
+      allowedStudents[code].name = newName.trim();
+
+      try {
+        const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
+        const dataGet = await resGet.json();
+        await updateCloudData(dataGet.record.logs || [], allowedStudents, dataGet.record.activeUsers || {}, dataGet.record.chatMessages || []);
+        alert("تم تحديث الاسم بنجاح في السحابة!");
+        showAdminDashboard(allowedStudents[currentLoggedInCode].name, currentLoggedInCode, currentLoggedInRole, dataGet.record.activeUsers);
+      } catch (err) {
+        alert("فشل تحديث الاسم!");
       }
     }
 
@@ -698,26 +885,26 @@
       try {
         const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
         const dataGet = await resGet.json();
-        
-        await fetch(API_URL, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
-          body: JSON.stringify({ logs: dataGet.record.logs || [], students: allowedStudents })
-        });
+        await updateCloudData(dataGet.record.logs || [], allowedStudents, dataGet.record.activeUsers || {}, dataGet.record.chatMessages || []);
 
         alert(`تم إضافة الطالب (${name}) بنجاح للسحابة!`);
         nameInput.value = "";
         codeInput.value = "";
         
-        renderAdminManageList("00000", "المالك");
+        showAdminDashboard(allowedStudents[currentLoggedInCode].name, currentLoggedInCode, currentLoggedInRole, dataGet.record.activeUsers);
       } catch (err) {
         alert("فشل الحفظ في السحابة!");
       }
     }
 
     async function updateStudentRole(code, newRole) {
-      if (code === MASTER_OWNER_CODE) {
-        alert("لا يمكن تغيير صلاحية المالك الأساسي!");
+      if (code === MASTER_DEVELOPER_CODE) {
+        alert("لا يمكن تغيير صلاحية أو دور مؤسس التطبيق الأساسي أبداً!");
+        return;
+      }
+
+      if (currentLoggedInRole !== "المالك" && currentLoggedInCode !== MASTER_DEVELOPER_CODE) {
+        alert("ليس لديك صلاحية تغيير الأدوار!");
         return;
       }
 
@@ -728,40 +915,32 @@
       try {
         const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
         const dataGet = await resGet.json();
-        
-        await fetch(API_URL, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
-          body: JSON.stringify({ logs: dataGet.record.logs || [], students: allowedStudents })
-        });
-
-        renderAdminManageList("00000", "المالك");
+        await updateCloudData(dataGet.record.logs || [], allowedStudents, dataGet.record.activeUsers || {}, dataGet.record.chatMessages || []);
+        alert("تم تحديث الدور بنجاح في السحابة!");
+        showAdminDashboard(allowedStudents[currentLoggedInCode].name, currentLoggedInCode, currentLoggedInRole, dataGet.record.activeUsers);
       } catch (err) {
-        alert("فشل تحديث الدور في السحابة!");
+        alert("فشل تحديث الدور!");
       }
     }
 
-    async function adminDeleteStudent(code, currentAdminCode, currentAdminRole) {
-      if (code === MASTER_OWNER_CODE) {
-        alert("لا يمكن حذف المالك الأساسي أبداً!");
+    async function adminDeleteStudent(code) {
+      if (currentLoggedInCode !== MASTER_DEVELOPER_CODE) {
+        alert("حذف الطلاب متاح حصراً لمؤسس التطبيق!");
         return;
       }
-
-      if (!confirm(`هل أنت متأكد من حذف هذا الحساب؟`)) return;
+      if (code === MASTER_DEVELOPER_CODE) {
+        alert("خطأ أمني: لا يمكنك حذف حساب مؤسس التطبيق الأساسي تحت أي ظرف!");
+        return;
+      }
+      if (!confirm("هل أنت متأكد من حذف هذا الحساب؟")) return;
 
       delete allowedStudents[code];
 
       try {
         const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
         const dataGet = await resGet.json();
-        
-        await fetch(API_URL, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
-          body: JSON.stringify({ logs: dataGet.record.logs || [], students: allowedStudents })
-        });
-
-        renderAdminManageList(currentAdminCode, currentAdminRole);
+        await updateCloudData(dataGet.record.logs || [], allowedStudents, dataGet.record.activeUsers || {}, dataGet.record.chatMessages || []);
+        showAdminDashboard(allowedStudents[currentLoggedInCode].name, currentLoggedInCode, currentLoggedInRole, dataGet.record.activeUsers);
       } catch (err) {
         alert("فشل الحذف من السحابة!");
       }
@@ -771,6 +950,7 @@
       document.getElementById("mainPage").style.display = "none";
       document.getElementById("adminDashboardPage").style.display = "none";
       document.getElementById("projectInfoPage").style.display = "none";
+      document.getElementById("chatPage").style.display = "none";
       document.getElementById("studentsPage").style.display = "block";
       document.getElementById("welcomeMsg").innerText = `مرحباً بك: ${studentName}`;
       
@@ -799,6 +979,94 @@
       });
     }
 
+    // دوال الدردشة الجماعية السحابية
+    function openChatRoom() {
+      document.getElementById("adminDashboardPage").style.display = "none";
+      document.getElementById("studentsPage").style.display = "none";
+      document.getElementById("chatPage").style.display = "block";
+      fetchChatMessages();
+      // تحديث الرسائل تلقائياً كل 4 ثوانٍ
+      chatRefreshInterval = setInterval(fetchChatMessages, 4000);
+    }
+
+    function backFromChat() {
+      clearInterval(chatRefreshInterval);
+      if (currentLoggedInRole === "مشرف" || currentLoggedInRole === "المالك") {
+        document.getElementById("chatPage").style.display = "none";
+        document.getElementById("adminDashboardPage").style.display = "block";
+      } else {
+        document.getElementById("chatPage").style.display = "none";
+        document.getElementById("studentsPage").style.display = "block";
+      }
+    }
+
+    async function fetchChatMessages() {
+      const container = document.getElementById("chatMessagesContainer");
+      try {
+        const res = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
+        const data = await res.json();
+        const messages = data.record.chatMessages || [];
+        
+        if (messages.length === 0) {
+          container.innerHTML = "<p style='text-align:center; color:var(--text-sub); font-size:11px; margin-top:20px;'>لا توجد رسائل حالياً. كن أول من يبدأ المحادثة!</p>";
+          return;
+        }
+
+        container.innerHTML = "";
+        messages.forEach(msg => {
+          const div = document.createElement("div");
+          div.className = "chat-msg";
+          div.innerHTML = `
+            <div class="chat-sender">
+              <span>👤 ${msg.senderName} (${msg.senderRole})</span>
+              <span class="chat-time">${msg.timestamp}</span>
+            </div>
+            <div style="color:var(--text-main); margin-top:3px; word-break:break-word;">${msg.text}</div>
+          `;
+          container.appendChild(div);
+        });
+        container.scrollTop = container.scrollHeight;
+      } catch (err) {
+        container.innerHTML = "<p style='color:red; font-size:11px;'>خطأ في تحميل رسائل الدردشة</p>";
+      }
+    }
+
+    async function sendChatMessage() {
+      const input = document.getElementById("chatInputMessage");
+      const text = input.value.trim();
+      if (!text) return;
+
+      const newMsg = {
+        senderName: currentLoggedInName || "مستخدم",
+        senderRole: currentLoggedInRole || "عضو",
+        text: text,
+        timestamp: new Date().toLocaleTimeString("ar-IQ", { hour: '2-digit', minute: '2-digit' })
+      };
+
+      try {
+        const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
+        const dataGet = await resGet.json();
+        let logs = dataGet.record.logs || [];
+        let students = dataGet.record.students || allowedStudents;
+        let activeUsers = dataGet.record.activeUsers || {};
+        let chatMessages = dataGet.record.chatMessages || [];
+
+        chatMessages.push(newMsg);
+
+        await updateCloudData(logs, students, activeUsers, chatMessages);
+        input.value = "";
+        fetchChatMessages();
+      } catch (err) {
+        alert("فشل إرسال الرسالة للسحابة!");
+      }
+    }
+
+    function handleChatKeyPress(event) {
+      if (event.key === 'Enter') {
+        sendChatMessage();
+      }
+    }
+
     function showProjectInfo(sName) {
       document.getElementById("studentsPage").style.display = "none";
       document.getElementById("projectInfoPage").style.display = "block";
@@ -811,9 +1079,11 @@
     }
 
     function goBackToMain() {
+      clearInterval(chatRefreshInterval);
       document.getElementById("studentsPage").style.display = "none";
       document.getElementById("adminDashboardPage").style.display = "none";
       document.getElementById("projectInfoPage").style.display = "none";
+      document.getElementById("chatPage").style.display = "none";
       document.getElementById("mainPage").style.display = "block";
       fetchLogs();
     }
@@ -838,11 +1108,7 @@
       try {
         const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
         const dataGet = await resGet.json();
-        await fetch(API_URL, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
-          body: JSON.stringify({ logs: dataGet.record.logs || [], students: allowedStudents })
-        });
+        await updateCloudData(dataGet.record.logs || [], allowedStudents, dataGet.record.activeUsers || {}, dataGet.record.chatMessages || []);
         alert(`تم تحديث الكود بنجاح يا ${sName}!`);
         fetchLogs();
       } catch (err) {
@@ -855,11 +1121,7 @@
       try {
         const resGet = await fetch(API_URL, { headers: { "X-Master-Key": API_KEY } });
         const dataGet = await resGet.json();
-        await fetch(API_URL, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
-          body: JSON.stringify({ logs: [], students: dataGet.record.students || allowedStudents })
-        });
+        await updateCloudData([], dataGet.record.students || allowedStudents, dataGet.record.activeUsers || {}, dataGet.record.chatMessages || []);
         fetchLogs();
       } catch (err) {
         alert("فشل مسح السجلات!");
