@@ -326,10 +326,10 @@
       <p class="subtitle" id="welcomeMsg" style="color: var(--primary); font-weight: 600;"></p>
       
       <div class="game-container">
-        <h3 style="margin: 0 0 8px 0; color:var(--text-main); font-size:14px;">🐍 لعبة الحية والدرج المصغرة 🪜</h3>
-        <p style="font-size: 11px; color: var(--text-sub); margin-bottom: 8px;">السلالم تصعد بك (🟢)، والحيات تعيدك للأسفل (🔴)! الوصل للخانة 25 يفوز.</p>
+        <h3 style="margin: 0 0 8px 0; color:var(--text-main); font-size:14px;">🐍 لعبة الحية والدرج 🪜</h3>
+        <p style="font-size: 11px; color: var(--text-sub); margin-bottom: 8px;">السلالم تصعد بك (🟢)، والحيات تعيدك للأسفل (🔴). الوصل للخانة 25 يفوز.</p>
         
-        <!-- لوحة اللعب (25 خانة مصغرة تناسب الموبايل) -->
+        <!-- لوحة اللعب (25 خانة) -->
         <div class="board-grid" id="boardGrid"></div>
 
         <div class="dice-area">
@@ -358,7 +358,6 @@
     };
 
     let allowedStudents = {};
-    
     let playerPos = 1;
     const winningSquare = 25;
     const snakesAndLadders = {
@@ -370,6 +369,7 @@
 
     function initBoard() {
       const grid = document.getElementById("boardGrid");
+      if (!grid) return;
       grid.innerHTML = "";
       for (let i = 25; i >= 1; i--) {
         const cell = document.createElement("div");
@@ -398,7 +398,8 @@
 
     function rollDice() {
       const dice = Math.floor(Math.random() * 6) + 1;
-      document.getElementById("diceVal").innerText = dice;
+      const diceValEl = document.getElementById("diceVal");
+      if (diceValEl) diceValEl.innerText = dice;
       
       playerPos += dice;
       let statusText = `رميت النرد وظهر: ${dice}. تقدمت للخانة ${playerPos}.`;
@@ -413,7 +414,7 @@
         if (playerPos > oldPos) {
           statusText += ` ممتاز! صعدت عبر الدرج من ${oldPos} إلى ${playerPos} 🟢🪜`;
         } else {
-          statusText += ` أوقات سيئة! بلعتك الحية ونزلت من ${oldPos} إلى ${playerPos} 🔴🐍`;
+          statusText += ` حظ سيء! نزلت بسبب الحية من ${oldPos} إلى ${playerPos} 🔴🐍`;
         }
       }
 
@@ -422,7 +423,8 @@
         alert("مبروك فوزك بلعبة الحية والدرج داخل النظام!");
       }
 
-      document.getElementById("gameStatus").innerText = statusText;
+      const gameStatusEl = document.getElementById("gameStatus");
+      if (gameStatusEl) gameStatusEl.innerText = statusText;
       updatePlayerPosition();
     }
 
@@ -484,6 +486,7 @@
 
     async function fetchLogs() {
       const logsList = document.getElementById("logsList");
+      if (!logsList) return;
       try {
         const res = await fetch(API_URL, {
           headers: { "X-Master-Key": API_KEY }
@@ -578,6 +581,7 @@
     function goBackToMain() {
       document.getElementById("studentsPage").style.display = "none";
       document.getElementById("mainPage").style.display = "block";
+      fetchLogs();
     }
 
     async function changeCardCode() {
